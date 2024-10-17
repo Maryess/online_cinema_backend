@@ -29,6 +29,9 @@ model Movie {
   rating      Int
   description String
   feedback    String
+
+  Actor   Actor? @relation(fields: [actorId], references: [id])
+  actorId Int?
 }
 
 model Comment {
@@ -39,4 +42,14 @@ model Comment {
 
   User   User? @relation(fields: [userId], references: [id])
   userId Int?
+}
+
+model Actor {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedt  DateTime @default(now()) @map("updated_at")
+
+  rating Int
+  Movie  Movie[]
 }
