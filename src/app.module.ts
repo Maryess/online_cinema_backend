@@ -9,7 +9,7 @@ import { AppService } from './app.service';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      password: '1234',
+      password: '2012',
       username: 'postgres',
       entities: [],
       database: 'cinema',
