@@ -1,11 +1,9 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Movie {
+export class PopularMovie {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  name: string;
-  @Column()
-  evaluation: number;
+  movie: string;
 }

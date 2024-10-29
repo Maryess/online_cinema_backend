@@ -9,10 +9,11 @@ export class MovieService {
   ) {}
 
   async createMovie(name: string): Promise<Movie | string> {
-    const movie = this.movieRepository.create({ name });
+    const evaluation: number = 0;
 
+    const movie = this.movieRepository.create({ name, evaluation });
     if (movie) {
-      return movie;
+      return this.movieRepository.save(movie);
     } else {
       return 'Please,check validate on your fields';
     }
@@ -26,6 +27,10 @@ export class MovieService {
     } else {
       return 'Please,check validate on your fields';
     }
+  }
+
+  async removeAllMovie() {
+    const movie = this.movieRepository.find();
   }
 
   async updateMovie(id: number, changeName: string) {
