@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ActorModule } from './actor/actor.module';
+import { Actor } from './actor/entity/actor.entity';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
+import { Movie } from './movie/entity/movie.entity';
+import { MovieModule } from './movie/movie.module';
 import { User } from './user/entity/user.entity';
-import { UserController } from './user/user.controller';
-import { UserService } from './user/user.service';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,17 +21,20 @@ import { UserService } from './user/user.service';
       database: 'cinema',
       synchronize: true,
       logging: true,
-      entities: [User],
+      entities: [User, Actor, Movie],
     }),
-    TypeOrmModule.forFeature([User]),
     JwtModule.register({
       secret: 'fhsguhURSKNDDKJhfdgjsn123sjkg',
       signOptions: {
         expiresIn: 3600,
       },
     }),
+    UserModule,
+    ActorModule,
+    MovieModule,
   ],
-  controllers: [AppController, AuthController, UserController],
-  providers: [AppService, AuthService, UserService],
+
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
