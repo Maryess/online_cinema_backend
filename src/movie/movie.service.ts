@@ -1,4 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateActorDto } from 'src/actor/dto/create-actor.dto';
 import { Repository } from 'typeorm';
 import { Movie } from './entity/movie.entity';
 
@@ -8,9 +9,12 @@ export class MovieService {
     private readonly movieRepository: Repository<Movie>,
   ) {}
 
-  async createMovie(name: string): Promise<Movie | string> {
+  async createMovie(
+    name: string,
+    actor: CreateActorDto,
+  ): Promise<Movie | string> {
     const evaluation: number = 0;
-    const movie = this.movieRepository.create({ name, evaluation });
+    const movie = this.movieRepository.create({ name, evaluation, ...actor });
     if (movie) {
       return this.movieRepository.save(movie);
     } else {
@@ -22,7 +26,7 @@ export class MovieService {
     const movie = this.movieRepository.delete({ id: id });
 
     if (movie) {
-      return 'Movie delete';
+      return 'Movie deleted';
     } else {
       return 'Please,check validate on your fields';
     }
@@ -43,6 +47,10 @@ export class MovieService {
   }
 
   async getAllMovies() {
-    return this.movieRepository.find();
+    return this.movieRepository.find({
+      relations: {
+        actor: true,
+      },
+    });
   }
 }

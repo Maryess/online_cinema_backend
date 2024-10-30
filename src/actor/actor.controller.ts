@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import { CreateMovieDto } from 'src/movie/dto/create-movie.dto';
 import { ActorService } from './actor.service';
 import { CreateActorDto } from './dto/create-actor.dto';
+import { UpdateActorDto } from './dto/update-actor.dto';
 
 @Controller('/actor')
 export class ActorController {
@@ -12,20 +14,23 @@ export class ActorController {
   }
 
   @Post()
-  createUser(@Body() createActorDto: CreateActorDto) {
-    return this.ActorService.createActor(createActorDto.name);
+  createUser(
+    @Body() createActorDto: CreateActorDto,
+    createMovieDto: CreateMovieDto,
+  ) {
+    return this.ActorService.createActor(createActorDto.name, createMovieDto);
   }
 
   @Delete()
-  deleteUser(@Body() createActorDto: CreateActorDto) {
-    return this.ActorService.removeActor(createActorDto.id);
+  deleteUser(@Body() updateActroDto: UpdateActorDto) {
+    return this.ActorService.removeActor(updateActroDto.id);
   }
 
   @Patch()
-  updateUser(@Body() createActorDto: CreateActorDto) {
+  updateUser(@Body() updateActroDto: UpdateActorDto) {
     return this.ActorService.updateActor(
-      createActorDto.id,
-      createActorDto.changeName,
+      updateActroDto.id,
+      updateActroDto.changeName,
     );
   }
 }

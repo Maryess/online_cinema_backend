@@ -1,5 +1,7 @@
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import { CreateActorDto } from 'src/actor/dto/create-actor.dto';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
 
 @Controller('/movie')
@@ -7,25 +9,28 @@ export class MovieController {
   constructor(private readonly MovieService: MovieService) {}
 
   @Get()
-  getAllUser() {
+  getAllMovie() {
     return this.MovieService.getAllMovies();
   }
 
   @Post()
-  createUser(@Body() createMovieDto: CreateMovieDto) {
-    return this.MovieService.createMovie(createMovieDto.name);
+  createMovie(
+    @Body() createMovieDto: CreateMovieDto,
+    createActorDto: CreateActorDto,
+  ) {
+    return this.MovieService.createMovie(createMovieDto.name, createActorDto);
   }
 
   @Delete()
-  deleteUser(@Body() createMovieDto: CreateMovieDto) {
-    return this.MovieService.removeMovie(createMovieDto.id);
+  deleteMovie(@Body() updateMovieDto: UpdateMovieDto) {
+    return this.MovieService.removeMovie(updateMovieDto.id);
   }
 
   @Patch()
-  updateUser(@Body() createMovieDto: CreateMovieDto) {
+  updateMovie(@Body() updateMovieDto: UpdateMovieDto) {
     return this.MovieService.updateMovie(
-      createMovieDto.id,
-      createMovieDto.changeName,
+      updateMovieDto.id,
+      updateMovieDto.changeName,
     );
   }
 }

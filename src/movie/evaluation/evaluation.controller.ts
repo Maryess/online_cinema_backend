@@ -1,5 +1,5 @@
 import { Body, Controller, Patch } from '@nestjs/common';
-import { CreateMovieDto } from '../dto/create-movie.dto';
+import { UpdateMovieDto } from '../dto/update-movie.dto';
 import { EvaluationService } from './evaluation.module';
 
 @Controller('/movie/evaluation')
@@ -7,10 +7,10 @@ export class EvaluationController {
   constructor(private readonly EvaluationService: EvaluationService) {}
 
   @Patch()
-  updateEvaluation(@Body() createMovieDto: CreateMovieDto) {
+  updateEvaluation(@Body() updateMovieDto: UpdateMovieDto) {
     return this.EvaluationService.updateEvaluating(
-      createMovieDto.id,
-      createMovieDto.evaluation,
+      updateMovieDto.id,
+      updateMovieDto.evaluation,
     );
   }
 }

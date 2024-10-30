@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Movie } from 'src/movie/entity/movie.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Actor {
@@ -7,9 +8,8 @@ export class Actor {
   @Column()
   name: string;
 
-  // @OneToMany(() => Movie, (movie) => movie.actor, {
-  //   cascade: true,
-  //   eager: true,
-  // })
-  // movies: Movie[];
+  @OneToMany(() => Movie, (movie) => movie.actor, {
+    eager: true,
+  })
+  movies: Movie[];
 }
