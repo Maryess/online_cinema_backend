@@ -6,4 +6,10 @@ export class Actor {
   id: number;
   @Column()
   name: string;
+
+  // @OneToMany(() => Movie, (movie) => movie.actor, {
+  //   cascade: true,
+  //   eager: true,
+  // })
+  // movies: Movie[];
 }

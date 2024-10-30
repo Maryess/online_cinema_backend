@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entity/user.entity';
@@ -17,11 +17,15 @@ export class AuthService {
     password: string,
     name: string,
   ): Promise<User | string> {
-    const createUser = this.userRepository.create({ name, password, email });
+    const payload = { username: name };
+    const access_token = this.jwtService.sign(payload);
 
-    if (createUser) {
-      throw new NotAcceptableException('User already exist ');
-    }
+    const createUser = this.userRepository.create({
+      name,
+      password,
+      email,
+      access_token,
+    });
 
     return this.userRepository.save(createUser);
   }
@@ -34,13 +38,8 @@ export class AuthService {
         password: password,
       },
     });
-
-    const payload = { username: name };
-
     if (getUser) {
-      return {
-        access_token: this.jwtService.sign(payload),
-      };
+      return getUser;
     } else {
       throw new Error('Please, check your fields on valid');
     }

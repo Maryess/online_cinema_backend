@@ -9,14 +9,14 @@ export class EvaluationService {
   ) {}
 
   async updateEvaluating(id: number, updateEvaluating: number) {
-    const movie = this.movieRepository.update(id, {
-      evaluation: updateEvaluating,
-    });
-
-    if (movie) {
-      return 'Evaluation in this movie updated';
+    if (updateEvaluating > 5) {
+      return 'Its must be a current value.Please, type to a number with 1 to 5';
     } else {
-      return 'Please, check validate on your fields';
+      this.movieRepository.update(id, {
+        evaluation: updateEvaluating,
+      });
+
+      return 'Evaluation in this movie updated';
     }
   }
 }

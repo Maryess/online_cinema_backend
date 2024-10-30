@@ -23,7 +23,7 @@ export class UserController {
 
   @Delete()
   deleteUser(@Body() createUserDto: CreateUserDto) {
-    return this.UserService.removeUser(createUserDto.name);
+    return this.UserService.removeUser(createUserDto.id);
   }
 
   @Patch()

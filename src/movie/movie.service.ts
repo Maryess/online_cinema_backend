@@ -10,7 +10,6 @@ export class MovieService {
 
   async createMovie(name: string): Promise<Movie | string> {
     const evaluation: number = 0;
-
     const movie = this.movieRepository.create({ name, evaluation });
     if (movie) {
       return this.movieRepository.save(movie);

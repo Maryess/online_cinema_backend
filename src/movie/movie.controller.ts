@@ -16,14 +16,6 @@ export class MovieController {
     return this.MovieService.createMovie(createMovieDto.name);
   }
 
-  // @Patch()
-  // updateEvaluation(@Body() createMovieDto: CreateMovieDto) {
-  //   return this.MovieService.updateEvaluating(
-  //     createMovieDto.id,
-  //     createMovieDto.evaluation,
-  //   );
-  // }
-
   @Delete()
   deleteUser(@Body() createMovieDto: CreateMovieDto) {
     return this.MovieService.removeMovie(createMovieDto.id);

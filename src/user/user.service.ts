@@ -24,15 +24,15 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async removeUser(name: string): Promise<User | string> {
+  async removeUser(id: number): Promise<User | string> {
     const user = this.userRepository.findOne({
       where: {
-        name: name,
+        id: id,
       },
     });
 
     if (user) {
-      this.userRepository.delete({ name: name });
+      this.userRepository.delete({ id: id });
       return 'User deleted';
     } else {
       return 'User not found';

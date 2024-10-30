@@ -8,4 +8,10 @@ export class Movie {
   name: string;
   @Column()
   evaluation: number;
+
+  // @ManyToOne(() => Actor, (actor) => actor.movies, {
+  //   cascade: true,
+  //   eager: true,
+  // })
+  // actor: Actor;
 }
