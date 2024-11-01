@@ -1,4 +1,12 @@
+import { Type } from 'class-transformer';
+import { IsArray, ValidateNested } from 'class-validator';
+import { CreateMovieDto } from 'src/movie/dto/create-movie.dto';
+
 export class UpdateActorDto {
-  id: number;
-  changeName: string;
+  name: string;
+
+  @ValidateNested()
+  @IsArray()
+  @Type(() => CreateMovieDto)
+  movies: CreateMovieDto[];
 }

@@ -24,12 +24,6 @@ import { UserModule } from './user/user.module';
       logging: true,
       entities: [User, Actor, Movie],
     }),
-    JwtModule.register({
-      secret: 'fhsguhURSKNDDKJhfdgjsn123sjkg',
-      signOptions: {
-        expiresIn: 3600,
-      },
-    }),
     UserModule,
     ActorModule,
     MovieModule,
