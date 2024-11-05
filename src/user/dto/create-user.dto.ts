@@ -10,6 +10,7 @@ export class CreateUserDto {
   password: string;
 
   refreshToken: string;
+  accessToken: string;
 
   createdAt: string;
   updatedAt: string;

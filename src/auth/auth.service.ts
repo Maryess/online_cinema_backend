@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
 
@@ -12,14 +13,11 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(
-    email: string,
-    password: string,
-    name: string,
-  ): Promise<User | string> {
+  async signUp(user: CreateUserDto): Promise<User | string> {
+    const { email, password, name } = user;
+
     const payload = { username: name };
     const access_token = this.jwtService.sign(payload);
-
     const createUser = this.userRepository.create({
       name,
       password,
@@ -30,7 +28,8 @@ export class AuthService {
     return this.userRepository.save(createUser);
   }
 
-  async signIn(email: string, password: string, name: string) {
+  async signIn(user: CreateUserDto) {
+    const { email, name, password } = user;
     const getUser = this.userRepository.findOne({
       where: {
         name: name,
@@ -43,5 +42,19 @@ export class AuthService {
     } else {
       throw new Error('Please, check your fields on valid');
     }
+  }
+
+  async verifyToken(user: CreateUserDto) {
+    const { name, email } = user;
+    const allUsers = this.userRepository.find();
+    (await allUsers).map((user) => {
+      if (user.access_token === null) {
+        const payload = { name: name, email: email };
+        const refresh_token = this.jwtService.sign(payload);
+        return this.userRepository.update(user.id, {
+          access_token: refresh_token,
+        });
+      }
+    });
   }
 }
