@@ -29,6 +29,19 @@ export class ActorService {
     }
   }
 
+  // async removeAllActor(){
+  //   const getAllMovie = this.actorRepository.find()
+
+  //   if(getAllMovie){
+  //     return this.actorRepository.delete({})
+  //   }else{
+  //     return {
+  //       message:'Movies deleted'
+  //     }
+  //   }
+
+  // }
+
   async updateActor(id: number, actor: UpdateActorDto) {
     const updateActor = this.actorRepository.update(id, {
       ...actor,
@@ -43,5 +56,9 @@ export class ActorService {
 
   async getAllActor() {
     return this.actorRepository.find();
+  }
+
+  async getActorId(id: number) {
+    return this.actorRepository.findOne({ where: { id: id } });
   }
 }

@@ -21,6 +21,11 @@ export class ActorController {
     return this.ActorService.getAllActor();
   }
 
+  @Get(':id')
+  getActorId(@Param('id') id: number) {
+    return this.ActorService.getActorId(id);
+  }
+
   @Post()
   createActor(@Body() data: CreateActorDto) {
     const actor = new Actor();
@@ -29,7 +34,7 @@ export class ActorController {
   }
 
   @Delete(':id')
-  deleteActor(@Param('id') id: number, @Body() updateActroDto: UpdateActorDto) {
+  deleteActor(@Param('id') id: number) {
     return this.ActorService.removeActor(id);
   }
 

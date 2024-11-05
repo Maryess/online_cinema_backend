@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateActorDto } from 'src/actor/dto/create-actor.dto';
 import { Repository } from 'typeorm';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entity/movie.entity';
 
 export class MovieService {
@@ -9,14 +9,10 @@ export class MovieService {
     private readonly movieRepository: Repository<Movie>,
   ) {}
 
-  async createMovie(
-    name: string,
-    actor: CreateActorDto,
-  ): Promise<Movie | string> {
-    const evaluation: number = 0;
-    const movie = this.movieRepository.create({ name, evaluation, ...actor });
-    if (movie) {
-      return this.movieRepository.save(movie);
+  async createMovie(movie: Movie) {
+    const createMovie = this.movieRepository.create(movie);
+    if (createMovie) {
+      return this.movieRepository.save(createMovie);
     } else {
       return 'Please,check validate on your fields';
     }
@@ -36,21 +32,21 @@ export class MovieService {
     const movie = this.movieRepository.find();
   }
 
-  async updateMovie(id: number, changeName: string) {
-    const movie = this.movieRepository.update(id, { name: changeName });
+  async updateMovie(id: number, movie: UpdateMovieDto) {
+    const updateMovie = this.movieRepository.update(id, { ...movie });
 
-    if (movie) {
-      return 'Movie updated';
+    if (updateMovie) {
+      return { message: 'Movie updated', id: `${id}` };
     } else {
       return 'Please,check validate on your fields';
     }
   }
 
   async getAllMovies() {
-    return this.movieRepository.find({
-      relations: {
-        actor: true,
-      },
-    });
+    return this.movieRepository.find();
+  }
+
+  async getMovieId(id: number) {
+    return this.movieRepository.findOne({ where: { id: id } });
   }
 }

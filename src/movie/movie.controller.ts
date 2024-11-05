@@ -1,7 +1,15 @@
-import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
-import { CreateActorDto } from 'src/actor/dto/create-actor.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { Movie } from './entity/movie.entity';
 import { MovieService } from './movie.service';
 
 @Controller('/movie')
@@ -13,12 +21,16 @@ export class MovieController {
     return this.MovieService.getAllMovies();
   }
 
+  @Get(':id')
+  getMovieId(@Param('id') id: number) {
+    return this.MovieService.getMovieId(id);
+  }
+
   @Post()
-  createMovie(
-    @Body() createMovieDto: CreateMovieDto,
-    createActorDto: CreateActorDto,
-  ) {
-    return this.MovieService.createMovie(createMovieDto.name, createActorDto);
+  createMovie(@Body() data: CreateMovieDto) {
+    const movie = new Movie();
+    Object.assign(movie, data);
+    return this.MovieService.createMovie(movie);
   }
 
   @Delete()
@@ -26,11 +38,11 @@ export class MovieController {
     return this.MovieService.removeMovie(updateMovieDto.id);
   }
 
-  @Patch()
-  updateMovie(@Body() updateMovieDto: UpdateMovieDto) {
-    return this.MovieService.updateMovie(
-      updateMovieDto.id,
-      updateMovieDto.changeName,
-    );
+  @Patch(':id')
+  updateMovie(@Param() id: number, @Body() data: UpdateMovieDto) {
+    const movie = new Movie();
+    Object.assign(movie, data);
+
+    return this.MovieService.updateMovie(id, data);
   }
 }
