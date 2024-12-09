@@ -1,4 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 
@@ -6,21 +13,15 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Post('/register')
   signUp(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signUp(
-      createUserDto.email,
-      createUserDto.password,
-      createUserDto.name,
-    );
+    return this.authService.signUp(createUserDto);
   }
 
-  // @Post()
-  // signIn(@Body() createUserDto: CreateUserDto) {
-  //   return this.authService.signIn(
-  //     createUserDto.email,
-  //     createUserDto.password,
-  //     createUserDto.name,
-  //   );
-  // }
+  @Post('/login')
+  signIn(@Body() createUserDto: CreateUserDto) {
+    return this.authService.signIn(createUserDto);
+  }
 }

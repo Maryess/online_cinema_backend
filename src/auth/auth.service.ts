@@ -13,7 +13,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(user: CreateUserDto): Promise<User | string> {
+  async signUp(user: CreateUserDto) {
     const { email, password, name } = user;
 
     const payload = { username: name };
@@ -30,6 +30,7 @@ export class AuthService {
 
   async signIn(user: CreateUserDto) {
     const { email, name, password } = user;
+
     const getUser = this.userRepository.findOne({
       where: {
         name: name,
@@ -37,10 +38,11 @@ export class AuthService {
         password: password,
       },
     });
+
     if (getUser) {
-      return getUser;
+      return 'success';
     } else {
-      throw new Error('Please, check your fields on valid');
+      return new Error('Please, check your fields on valid');
     }
   }
 
