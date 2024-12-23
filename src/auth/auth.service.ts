@@ -13,7 +13,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(user: CreateUserDto) {
+  async register(user: CreateUserDto) {
     const { email, password, name } = user;
 
     const payload = { username: name };
@@ -28,7 +28,7 @@ export class AuthService {
     return this.userRepository.save(createUser);
   }
 
-  async signIn(user: CreateUserDto) {
+  async auth(user: CreateUserDto) {
     const { email, name, password } = user;
 
     const getUser = this.userRepository.findOne({
@@ -40,7 +40,7 @@ export class AuthService {
     });
 
     if (getUser) {
-      return 'success';
+      return getUser;
     } else {
       return new Error('Please, check your fields on valid');
     }

@@ -15,13 +15,15 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post('/register')
-  signUp(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signUp(createUserDto);
+  @Post('login')
+  signIn(@Body() createUserDto: CreateUserDto) {
+    return this.authService.auth(createUserDto);
   }
 
-  @Post('/login')
-  signIn(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signIn(createUserDto);
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Post('/register')
+  signUp(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
   }
 }
