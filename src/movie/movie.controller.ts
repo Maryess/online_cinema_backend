@@ -27,15 +27,20 @@ export class MovieController {
   }
 
   @Post()
-  createMovie(@Body() data: CreateMovieDto) {
-    const movie = new Movie();
-    Object.assign(movie, data);
+  createMovie(@Body() movie: CreateMovieDto) {
+    // const movie = new Movie();
+    // Object.assign(movie, data);
     return this.MovieService.createMovie(movie);
   }
 
-  @Delete()
-  deleteMovie(@Body() updateMovieDto: UpdateMovieDto) {
-    return this.MovieService.removeMovie(updateMovieDto.id);
+  // @Delete()
+  // deleteAllMovie() {
+  //   return this.MovieService.removeAllMovie();
+  // }
+
+  @Delete(':id')
+  deleteMovie(@Param('id') id: number) {
+    return this.MovieService.removeMovie(id);
   }
 
   @Patch(':id')

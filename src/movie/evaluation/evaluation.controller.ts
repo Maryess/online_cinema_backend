@@ -8,9 +8,9 @@ export class EvaluationController {
 
   @Patch()
   updateEvaluation(@Body() updateMovieDto: UpdateMovieDto) {
-    return this.EvaluationService.updateEvaluating(
-      updateMovieDto.id,
-      updateMovieDto.evaluation,
-    );
+    // return this.EvaluationService.updateEvaluating(
+    //   updateMovieDto.id,
+    //   updateMovieDto.evaluation,
+    // );
   }
 }

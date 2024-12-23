@@ -1,5 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entity/movie.entity';
 
@@ -9,8 +10,14 @@ export class MovieService {
     private readonly movieRepository: Repository<Movie>,
   ) {}
 
-  async createMovie(movie: Movie) {
-    const createMovie = this.movieRepository.create(movie);
+  async createMovie(movie: CreateMovieDto) {
+    const { name, path } = movie;
+
+    const createMovie = this.movieRepository.create({
+      name: name,
+      path: path,
+    });
+
     if (createMovie) {
       return this.movieRepository.save(createMovie);
     } else {
@@ -30,6 +37,8 @@ export class MovieService {
 
   async removeAllMovie() {
     const movie = this.movieRepository.find();
+
+    return this.movieRepository.remove;
   }
 
   async updateMovie(id: number, movie: UpdateMovieDto) {

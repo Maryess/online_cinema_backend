@@ -1,5 +1,4 @@
-import { Actor } from 'src/actor/entity/actor.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Movie {
@@ -8,8 +7,7 @@ export class Movie {
   @Column()
   name: string;
   @Column()
-  evaluation: number;
-
-  @ManyToOne(() => Actor, (actor) => actor.movies, {})
-  actor: Actor;
+  path: string;
+  // @ManyToOne(() => Actor, (actor) => actor.movies, {})
+  // actor: Actor;
 }

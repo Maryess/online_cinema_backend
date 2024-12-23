@@ -1,6 +1,9 @@
-import { CreateActorDto } from 'src/actor/dto/create-actor.dto';
+import { IsString } from 'class-validator';
 
 export class CreateMovieDto {
+  @IsString()
   name: string;
-  actor: CreateActorDto;
+  @IsString()
+  path: string;
+  // actor: CreateActorDto;
 }
