@@ -27,9 +27,7 @@ export class ActorController {
   }
 
   @Post()
-  createActor(@Body() data: CreateActorDto) {
-    const actor = new Actor();
-    Object.assign(actor, data);
+  createActor(@Body() actor: CreateActorDto) {
     return this.ActorService.createActor(actor);
   }
 

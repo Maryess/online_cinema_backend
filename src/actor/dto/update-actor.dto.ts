@@ -1,8 +1,10 @@
-export class UpdateActorDto {
-  name: string;
+import { IsNumber, IsString } from "class-validator";
 
-  // @ValidateNested()
-  // @IsArray()
-  // @Type(() => CreateMovieDto)
-  // movies: CreateMovieDto[];
+export class UpdateActorDto {
+   @IsString()
+    firstName: string;
+    @IsString()
+    lastName:string;
+    @IsNumber()
+    year:number;
 }
