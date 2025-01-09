@@ -5,10 +5,9 @@ export class Actor {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  name: string;
-
-  // @OneToMany(() => Movie, (movie) => movie.actor, {
-  //   eager: true,
-  // })
-  // movies: Movie[];
+  firstName: string;
+  @Column()
+  lastName:string;
+  @Column()
+  year:number;
 }
