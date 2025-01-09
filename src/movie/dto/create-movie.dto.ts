@@ -1,9 +1,9 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreateMovieDto {
   @IsString()
   name: string;
-  @IsString()
-  path: string;
+  @IsNumber()
+  year: number;
   // actor: CreateActorDto;
 }

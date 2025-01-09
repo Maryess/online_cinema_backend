@@ -16,7 +16,7 @@ import { UserModule } from './user/user.module';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      password: '2012',
+      password: '6666',
       username: 'postgres',
       database: 'cinema',
       synchronize: true,

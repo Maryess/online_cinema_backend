@@ -7,7 +7,5 @@ export class Movie {
   @Column()
   name: string;
   @Column()
-  path: string;
-  // @ManyToOne(() => Actor, (actor) => actor.movies, {})
-  // actor: Actor;
+  year:number;
 }

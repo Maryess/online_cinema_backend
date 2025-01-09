@@ -11,11 +11,11 @@ export class MovieService {
   ) {}
 
   async createMovie(movie: CreateMovieDto) {
-    const { name, path } = movie;
+    const { name, year } = movie;
 
     const createMovie = this.movieRepository.create({
       name: name,
-      path: path,
+      year:year
     });
 
     if (createMovie) {
