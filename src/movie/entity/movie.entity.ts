@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class Movie {
@@ -8,4 +8,11 @@ export class Movie {
   name: string;
   @Column()
   year:number;
+
+  @CreateDateColumn()
+  created_at: Date;
+  @UpdateDateColumn()
+  updated_at: Date;
+  @DeleteDateColumn()
+  deleted_at: Date;
 }

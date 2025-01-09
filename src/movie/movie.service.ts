@@ -26,20 +26,32 @@ export class MovieService {
   }
 
   async removeMovie(id: number) {
-    const movie = this.movieRepository.delete({ id: id });
+    const movie = this.movieRepository.delete(id);
 
     if (movie) {
       return 'Movie deleted';
+
     } else {
       return 'Please,check validate on your fields';
     }
   }
 
   async removeAllMovie() {
-    const movie = this.movieRepository.find();
-
     return this.movieRepository.remove;
   }
+
+  // async updateMovieId(){
+  //   let updateId = 0;
+  //   const movie = this.movieRepository.find();
+  //   (await movie).map((element)=>{
+  //     if(element.id != 1){
+  //       updateId = 1
+  //       element.id = updateId
+  //     }
+  //   })
+  //   return movie;
+  
+  // }
 
   async updateMovie(id: number, movie: UpdateMovieDto) {
     const updateMovie = this.movieRepository.update(id, { ...movie });
