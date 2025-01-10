@@ -12,7 +12,7 @@ import { CreateGenreDto } from './dto/create-genre.dto';
 
 
 @Controller('/movie')
-export class MovieController {
+export class GenreController {
   constructor(private readonly GenreService
     : GenreService
 

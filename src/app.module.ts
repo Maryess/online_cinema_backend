@@ -9,6 +9,7 @@ import { Movie } from './movie/entity/movie.entity';
 import { MovieModule } from './movie/movie.module';
 import { User } from './user/entity/user.entity';
 import { UserModule } from './user/user.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UserModule } from './user/user.module';
     ActorModule,
     MovieModule,
     AuthModule,
+    FileModule
   ],
 
   controllers: [AppController],
