@@ -40,14 +40,14 @@ export class MovieController {
 
   @Delete(':id')
   deleteMovie(@Param('id') id: number) {
-    return this.MovieService.removeMovie(id);
+    
+    return this.MovieService.removeMovie(id)
+
+    
   }
 
   @Patch(':id')
   updateMovie(@Param() id: number, @Body() data: UpdateMovieDto) {
-    const movie = new Movie();
-    Object.assign(movie, data);
-
     return this.MovieService.updateMovie(id, data);
   }
 }
