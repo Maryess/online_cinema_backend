@@ -3,29 +3,46 @@ import { Repository } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entity/movie.entity';
+import { Actor } from 'src/actor/entity/actor.entity';
+import { Genre } from 'src/genre/entity/genre.entity';
 
 export class MovieService {
   constructor(
     @InjectRepository(Movie)
     private readonly movieRepository: Repository<Movie>,
+    @InjectRepository(Actor)
+    private readonly actorsRepository: Repository<Actor>,
+    @InjectRepository(Genre)
+    private readonly genreRepository: Repository<Genre>
   ) {}
 
   async createMovie(movie:CreateMovieDto) {
      const {
       poster='',
       bigPoster='',
-      name='', 
+      name='',
+      slug='', 
       deskription='',
       year=0,
       duration=0,
       country ='',
-      videoUrl='',
-      genres = [],
-      actors = []
+      videoUrl ='',
+      rating =4,
+      actors:actorIds,
+      genres:genreIds
      } = movie;
+
+    const actors = await this.actorsRepository.find({
+      where: actorIds.map((id) => ({ id })),
+    });
+
+    const genres = await this.genreRepository.find({
+      where: genreIds.map((id)=>({id}))
+    })
 
     const createMovie = this.movieRepository.create({
       name:name,
+      slug:slug,
       poster:poster,
       bigPoster:bigPoster,
       deskription:deskription,
@@ -33,28 +50,34 @@ export class MovieService {
       duration:duration,
       country:country,
       videoUrl:videoUrl,
-      actors:[],
-      genres:[]
+      rating:rating,
+      actors,
+      genres
     });
     
-
-    if (createMovie) {
+    if(createMovie){
       return this.movieRepository.save(createMovie);
-    } else {
-      return 'Please,check validate on your fields';
+    }else{
+      return {
+        message:"Movie don't deleted"
+      };
     }
   }
 
-  // async removeMovie(id: number) {
-  //   const movie = this.movieRepository.delete(id);
+  async removeMovie(_id: string) {
+    const movie = this.movieRepository.delete(_id);
 
-  //   if (movie) {
-  //     return 'Movie deleted';
+    if (movie) {
+      return {
+        message:"Movie deleted",
+      };
 
-  //   } else {
-  //     return 'Please,check validate on your fields';
-  //   }
-  // }
+    } else {
+      return {
+        message:"Movie don't deleted"
+      };
+    }
+  }
 
   // async removeAllMovie() {
   //   return this.movieRepository.remove;
@@ -83,9 +106,9 @@ export class MovieService {
   //   }
   // }
 
-  // async getAllMovies() {
-  //   return this.movieRepository.find();
-  // }
+  async getAllMovies() {
+    return this.movieRepository.find();
+  }
 
   // async getMovieId(id: number) {
   //   return this.movieRepository.findOne({ where: { id: id } });

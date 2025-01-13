@@ -1,11 +1,12 @@
-import { IsString } from "class-validator";
+import { IsArray, IsString } from "class-validator";
 
 export class CreateGenreDto{
     @IsString()
     name:string;
 
     @IsString()
-    deskription:string;
+    slug:string;
 
-    
+    @IsArray()
+    movies:string[]
 }

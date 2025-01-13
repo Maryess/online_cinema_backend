@@ -11,10 +11,11 @@ export class ActorService {
   ) {}
 
   async createActor(actor: CreateActorDto) {
-    const {name,year,country,photo} = actor
+    const {name,slug,year,country,photo} = actor
 
     const createActor = this.actorRepository.create({
       name:name,
+      slug:slug,
       year:year,
       country:country,
       photo:photo
@@ -27,13 +28,16 @@ export class ActorService {
     }
   }
 
-  async removeActor(name: string) {
-    const actor = this.actorRepository.delete({ name:name });
+  async removeActor(_id: string) {
+    const actor = this.actorRepository.delete({ id: _id });
 
     if (actor) {
-      return 'Actor delete';
+      return {
+        message:'Actor deleted'};
     } else {
-      return 'Please,check validate on your fields';
+      return {
+        message:"Actor don't deleted"
+      };
     }
   }
 
@@ -57,11 +61,11 @@ export class ActorService {
 
   }
 
-  async updateActor(id: number, actor: UpdateActorDto) {
-    const updateActor = this.actorRepository.update(id,{...actor});
+  async updateActor(_id: string, actor: UpdateActorDto) {
+    const updateActor = this.actorRepository.update(_id,{...actor});
 
     if (updateActor) {
-      return { message: 'Actor updated', id: `${id}` };
+      return { message: 'Actor updated', id: `${_id}` };
     } else {
       return 'Please,check validate on your fields';
     }
@@ -71,7 +75,7 @@ export class ActorService {
     return this.actorRepository.find();
   }
 
-  async getActorId(id: number) {
-    return this.actorRepository.findOne({ where: { id: id } });
+  async getActorId(_id: string) {
+    return this.actorRepository.findOne({ where: { id: _id } });
   }
 }

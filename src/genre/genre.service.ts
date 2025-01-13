@@ -2,47 +2,53 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Genre } from './entity/genre.entity';
 import { CreateGenreDto } from './dto/create-genre.dto';
+import { Movie } from 'src/movie/entity/movie.entity';
 
 
 export class GenreService {
   constructor(
     @InjectRepository(Genre)
-    private readonly GenreRepository: Repository<Genre>,
+    private readonly genreRepository: Repository<Genre>,
+    @InjectRepository(Movie)
+    private readonly movieRepository: Repository<Movie>,
   ) {}
 
   async createGenre(Genre: CreateGenreDto) {
-    const { name, deskription } = Genre;
+    const { name='',slug='',movies:movieIds} = Genre;
 
-    const createGenre = this.GenreRepository.create({
+    // const movies = await this.movieRepository.find({where: movieIds.map(id=>({id}))}) 
+
+    const createGenre = this.genreRepository.create({
       name: name,
-      deskription:deskription
+      slug:slug,
+      // movies
     });
 
     if (createGenre) {
-      return this.GenreRepository.save(createGenre);
+      return this.genreRepository.save(createGenre);
     } else {
       return 'Please,check validate on your fields';
     }
   }
 
-  async removeGenre(id: number) {
-    const Genre = this.GenreRepository.delete(id);
+  // async removeGenre(_id: string) {
+  //   const Genre = this.genreRepository.delete({id:_id});
 
-    if (Genre) {
-      return 'Genre deleted';
+  //   if (Genre) {
+  //     return 'Genre deleted';
 
-    } else {
-      return 'Please,check validate on your fields';
-    }
-  }
+  //   } else {
+  //     return 'Please,check validate on your fields';
+  //   }
+  // }
 
-  async removeAllGenre() {
-    return this.GenreRepository.remove;
-  }
+  // async removeAllGenre() {
+  //   return this.genreRepository.remove;
+  // }
 
   // async updateGenreId(){
   //   let updateId = 0;
-  //   const Genre = this.GenreRepository.find();
+  //   const Genre = this.genreRepository.find();
   //   (await Genre).map((element)=>{
   //     if(element.id != 1){
   //       updateId = 1
@@ -54,7 +60,7 @@ export class GenreService {
   // }
 
 //   async updateGenre(id: number, Genre: UpdateGenreDto) {
-//     const updateGenre = this.GenreRepository.update(id, { ...Genre });
+//     const updateGenre = this.genreRepository.update(id, { ...Genre });
 
 //     if (updateGenre) {
 //       return { message: 'Genre updated', id: `${id}` };
@@ -64,10 +70,10 @@ export class GenreService {
 //   }
 
   async getAllGenres() {
-    return this.GenreRepository.find();
+    return this.genreRepository.find();
   }
 
-  async getGenreId(id: number) {
-    return this.GenreRepository.findOne({ where: { id: id } });
-  }
+  // async getGenreId(_id: string) {
+  //   return this.genreRepository.findOne({ where: { id: _id } });
+  // }
 }

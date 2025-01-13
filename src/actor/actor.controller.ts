@@ -22,8 +22,8 @@ export class ActorController {
   }
 
   @Get(':id')
-  getActorId(@Param('id') id: number) {
-    return this.ActorService.getActorId(id);
+  getActorId(@Param('id') _id: string) {
+    return this.ActorService.getActorId(_id);
   }
 
   @Post()
@@ -42,9 +42,9 @@ export class ActorController {
   }
 
   @Patch(':id')
-  updateActor(@Param('id') id: number, @Body() data: UpdateActorDto) {
+  updateActor(@Param('id') _id: string, @Body() data: UpdateActorDto) {
     const actor = new Actor();
     Object.assign(actor, data);
-    return this.ActorService.updateActor(id, data);
+    return this.ActorService.updateActor(_id, data);
   }
 }

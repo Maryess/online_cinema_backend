@@ -16,10 +16,10 @@ import { MovieService } from './movie.service';
 export class MovieController {
   constructor(private readonly MovieService: MovieService) {}
 
-  // @Get()
-  // getAllMovie() {
-  //   return this.MovieService.getAllMovies();
-  // }
+  @Get()
+  getAllMovie() {
+    return this.MovieService.getAllMovies();
+  }
 
   // @Get(':id')
   // getMovieId(@Param('id') id: number) {
@@ -36,13 +36,10 @@ export class MovieController {
   //   return this.MovieService.removeAllMovie();
   // }
 
-  // @Delete(':id')
-  // deleteMovie(@Param('id') id: number) {
-    
-  //   return this.MovieService.removeMovie(id)
-
-    
-  // }
+  @Delete(':id')
+  deleteMovie(@Param('id') _id: string) {
+    return this.MovieService.removeMovie(_id)
+  }
 
   // @Patch(':id')
   // updateMovie(@Param() id: number, @Body() data: UpdateMovieDto) {

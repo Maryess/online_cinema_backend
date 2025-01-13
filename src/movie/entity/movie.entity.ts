@@ -1,14 +1,13 @@
 import { Actor } from 'src/actor/entity/actor.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
-import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from 'typeorm';
 
-@Entity()
+@Entity('movies')
 export class Movie {
-  @Column({unique:true})
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
   @Column()
-  poster:string;
+  poster:string; 
 
   @Column()
   bigPoster:string;
@@ -16,6 +15,9 @@ export class Movie {
   @Column()
   name: string;
   
+  @Column()
+  slug: string;
+
   @Column()
   deskription:string;
   
@@ -35,14 +37,12 @@ export class Movie {
   @Column({default:0})
   countOpened?:number;
   
-  @Column("char",{array:true})
-  @ManyToOne(type=>Actor)
-  actors:Actor[];
+  @ManyToMany(()=>Actor,(actor)=>actor.movies)
+  actors:Actor[]
 
-  @Column("char",{array:true})
-  @ManyToOne(type=>Genre)
-  genres:Genre[];
-
+  @ManyToMany(()=> Genre,(genre) => genre.movies)
+  genres:Genre[]
+  
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

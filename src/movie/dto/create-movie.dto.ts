@@ -12,6 +12,9 @@ export class CreateMovieDto {
   name: string;
   
   @IsString()
+  slug: string;
+
+  @IsString()
   deskription:string;
   
   @IsNumber()
@@ -21,6 +24,9 @@ export class CreateMovieDto {
   @IsString()
   country:string;
   
+  @IsNumber()
+  rating?:number;
+
   @IsString()
   videoUrl:string;
   

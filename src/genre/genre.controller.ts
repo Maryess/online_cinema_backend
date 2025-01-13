@@ -11,7 +11,7 @@ import { GenreService } from './genre.service';
 import { CreateGenreDto } from './dto/create-genre.dto';
 
 
-@Controller('/movie')
+@Controller('/genre')
 export class GenreController {
   constructor(private readonly GenreService
     : GenreService
@@ -19,23 +19,21 @@ export class GenreController {
   ) {}
 
   @Get()
-  getAllMovie() {
+  getAllGenre() {
     return this.GenreService
     .getAllGenres();
   }
 
-  @Get(':id')
-  getMovieId(@Param('id') id: number) {
-    return this.GenreService
-    .getGenreId(id);
-  }
+  // @Get(':id')
+  // getMovieId(@Param('id') _id: string) {
+  //   return this.GenreService
+  //   .getGenreId(_id);
+  // }
 
   @Post()
-  createMovie(@Body() movie: CreateGenreDto) {
-    // const movie = new Movie();
-    // Object.assign(movie, data);
+  createGenre(@Body() genre: CreateGenreDto) {
     return this.GenreService
-    .createGenre(movie);
+    .createGenre(genre);
   }
 
   // @Delete()
@@ -44,14 +42,14 @@ export class GenreController {
   // .removeAllMovie();
   // }
 
-  @Delete(':id')
-  deleteMovie(@Param('id') id: number) {
+  // @Delete(':id')
+  // deleteMovie(@Param('id') _id: string) {
     
-    return this.GenreService
-    .removeGenre(id)
+  //   return this.GenreService
+  //   .removeGenre(_id)
 
     
-  }
+  // }
 
 //   @Patch(':id')
 //   updateMovie(@Param() id: number, @Body() data: UpdateMovieDto) {
