@@ -10,6 +10,8 @@ import { MovieModule } from './movie/movie.module';
 import { User } from './user/entity/user.entity';
 import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
+import { GenreModule } from './genre/genre.module';
+import { Genre } from './genre/entity/genre.entity';
 
 @Module({
   imports: [
@@ -22,13 +24,14 @@ import { FileModule } from './file/file.module';
       database: 'cinema',
       synchronize: true,
       logging: true,
-      entities: [User, Actor, Movie],
+      entities: [User, Actor, Movie,Genre],
     }),
     UserModule,
     ActorModule,
     MovieModule,
     AuthModule,
-    FileModule
+    FileModule,
+    GenreModule
   ],
 
   controllers: [AppController],

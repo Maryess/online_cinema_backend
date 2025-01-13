@@ -2,14 +2,16 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedCol
 
 @Entity()
 export class Actor {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id: number;
   @Column()
-  firstName: string;
-  @Column()
-  lastName:string;
+  name:string;
   @Column()
   year:number;
+  @Column()
+  country:string;
+  @Column()
+  photo:string;
 
   @CreateDateColumn()
   created_at: Date;

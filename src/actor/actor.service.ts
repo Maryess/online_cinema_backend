@@ -11,12 +11,13 @@ export class ActorService {
   ) {}
 
   async createActor(actor: CreateActorDto) {
-    const {lastName,firstName,year} = actor
+    const {name,year,country,photo} = actor
 
     const createActor = this.actorRepository.create({
-      lastName:lastName,
-      firstName:firstName,
-      year:year
+      name:name,
+      year:year,
+      country:country,
+      photo:photo
     });
 
     if (createActor) {
@@ -26,8 +27,8 @@ export class ActorService {
     }
   }
 
-  async removeActor(id: number) {
-    const actor = this.actorRepository.delete({ id: id });
+  async removeActor(name: string) {
+    const actor = this.actorRepository.delete({ name:name });
 
     if (actor) {
       return 'Actor delete';
@@ -36,18 +37,25 @@ export class ActorService {
     }
   }
 
-  // async removeAllActor(){
-  //   const getAllMovie = this.actorRepository.find()
+  async removeAllActor(){
+    const removeActors = this.actorRepository.remove
 
-  //   if(getAllMovie){
-  //     return this.actorRepository.delete({})
-  //   }else{
-  //     return {
-  //       message:'Movies deleted'
-  //     }
-  //   }
+    if(removeActors){
+      return {
+        message:'Actors deleted'
+      }
+    }
+    // if(getAllMovie){
+    //   return {
+    //     message:'Actors deleted'
+    //   }
+    // }else{
+    //   return {
+    //     message:'Actors didnt deleted'
+    //   }
+    // }
 
-  // }
+  }
 
   async updateActor(id: number, actor: UpdateActorDto) {
     const updateActor = this.actorRepository.update(id,{...actor});

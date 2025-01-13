@@ -16,38 +16,38 @@ import { MovieService } from './movie.service';
 export class MovieController {
   constructor(private readonly MovieService: MovieService) {}
 
-  @Get()
-  getAllMovie() {
-    return this.MovieService.getAllMovies();
-  }
+  // @Get()
+  // getAllMovie() {
+  //   return this.MovieService.getAllMovies();
+  // }
 
-  @Get(':id')
-  getMovieId(@Param('id') id: number) {
-    return this.MovieService.getMovieId(id);
-  }
+  // @Get(':id')
+  // getMovieId(@Param('id') id: number) {
+  //   return this.MovieService.getMovieId(id);
+  // }
 
-  @Post()
-  createMovie(@Body() movie: CreateMovieDto) {
+  // @Post()
+  // createMovie(@Body() movie: CreateMovieDto) {
     // const movie = new Movie();
     // Object.assign(movie, data);
-    return this.MovieService.createMovie(movie);
-  }
+    // return this.MovieService.createMovie(movie);
+  // }
 
   // @Delete()
   // deleteAllMovie() {
   //   return this.MovieService.removeAllMovie();
   // }
 
-  @Delete(':id')
-  deleteMovie(@Param('id') id: number) {
+  // @Delete(':id')
+  // deleteMovie(@Param('id') id: number) {
     
-    return this.MovieService.removeMovie(id)
+  //   return this.MovieService.removeMovie(id)
 
     
-  }
+  // }
 
-  @Patch(':id')
-  updateMovie(@Param() id: number, @Body() data: UpdateMovieDto) {
-    return this.MovieService.updateMovie(id, data);
-  }
+  // @Patch(':id')
+  // updateMovie(@Param() id: number, @Body() data: UpdateMovieDto) {
+  //   return this.MovieService.updateMovie(id, data);
+  // }
 }

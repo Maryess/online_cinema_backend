@@ -31,9 +31,14 @@ export class ActorController {
     return this.ActorService.createActor(actor);
   }
 
-  @Delete(':id')
-  deleteActor(@Param('id') id: number) {
-    return this.ActorService.removeActor(id);
+  @Delete(':name')
+  deleteActor(@Param('name') name: string) {
+    return this.ActorService.removeActor(name);
+  }
+
+  @Delete()
+  deleteAllActors(){
+    return this.ActorService.removeAllActor()
   }
 
   @Patch(':id')

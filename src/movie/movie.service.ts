@@ -10,35 +10,35 @@ export class MovieService {
     private readonly movieRepository: Repository<Movie>,
   ) {}
 
-  async createMovie(movie: CreateMovieDto) {
-    const { name, year } = movie;
+  // async createMovie(movie: CreateMovieDto) {
+  //   const { name, year } = movie;
 
-    const createMovie = this.movieRepository.create({
-      name: name,
-      year:year
-    });
+  //   const createMovie = this.movieRepository.create({
+  //     name: name,
+  //     year:year
+  //   });
 
-    if (createMovie) {
-      return this.movieRepository.save(createMovie);
-    } else {
-      return 'Please,check validate on your fields';
-    }
-  }
+  //   if (createMovie) {
+  //     return this.movieRepository.save(createMovie);
+  //   } else {
+  //     return 'Please,check validate on your fields';
+  //   }
+  // }
 
-  async removeMovie(id: number) {
-    const movie = this.movieRepository.delete(id);
+  // async removeMovie(id: number) {
+  //   const movie = this.movieRepository.delete(id);
 
-    if (movie) {
-      return 'Movie deleted';
+  //   if (movie) {
+  //     return 'Movie deleted';
 
-    } else {
-      return 'Please,check validate on your fields';
-    }
-  }
+  //   } else {
+  //     return 'Please,check validate on your fields';
+  //   }
+  // }
 
-  async removeAllMovie() {
-    return this.movieRepository.remove;
-  }
+  // async removeAllMovie() {
+  //   return this.movieRepository.remove;
+  // }
 
   // async updateMovieId(){
   //   let updateId = 0;
@@ -53,21 +53,21 @@ export class MovieService {
   
   // }
 
-  async updateMovie(id: number, movie: UpdateMovieDto) {
-    const updateMovie = this.movieRepository.update(id, { ...movie });
+  // async updateMovie(id: number, movie: UpdateMovieDto) {
+  //   const updateMovie = this.movieRepository.update(id, { ...movie });
 
-    if (updateMovie) {
-      return { message: 'Movie updated', id: `${id}` };
-    } else {
-      return 'Please,check validate on your fields';
-    }
-  }
+  //   if (updateMovie) {
+  //     return { message: 'Movie updated', id: `${id}` };
+  //   } else {
+  //     return 'Please,check validate on your fields';
+  //   }
+  // }
 
-  async getAllMovies() {
-    return this.movieRepository.find();
-  }
+  // async getAllMovies() {
+  //   return this.movieRepository.find();
+  // }
 
-  async getMovieId(id: number) {
-    return this.movieRepository.findOne({ where: { id: id } });
-  }
+  // async getMovieId(id: number) {
+  //   return this.movieRepository.findOne({ where: { id: id } });
+  // }
 }

@@ -11,4 +11,4 @@ import { GenreService } from './genre.service';
   providers: [GenreService],
   exports: [GenreService],
 })
-export class MovieModule {}
+export class GenreModule {}
