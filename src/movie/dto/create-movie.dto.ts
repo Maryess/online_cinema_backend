@@ -1,13 +1,5 @@
-import { isArray, IsArray, IsNumber, IsObject, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsObject, IsString } from 'class-validator';
 
-export class Parameters{
-  @IsNumber()
-  year:number;
-  @IsNumber()
-  duration:number;
-  @IsString()
-  country:string;
-}
 
 export class CreateMovieDto {
   @IsString()
@@ -22,8 +14,12 @@ export class CreateMovieDto {
   @IsString()
   deskription:string;
   
-  @IsObject()
-  parametrs:Parameters;
+  @IsNumber()
+  year:number;
+  @IsNumber()
+  duration:number;
+  @IsString()
+  country:string;
   
   @IsString()
   videoUrl:string;

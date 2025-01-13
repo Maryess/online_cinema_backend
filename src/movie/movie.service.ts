@@ -10,20 +10,40 @@ export class MovieService {
     private readonly movieRepository: Repository<Movie>,
   ) {}
 
-  // async createMovie(movie: CreateMovieDto) {
-  //   const { name, year } = movie;
+  async createMovie(movie:CreateMovieDto) {
+     const {
+      poster='',
+      bigPoster='',
+      name='', 
+      deskription='',
+      year=0,
+      duration=0,
+      country ='',
+      videoUrl='',
+      genres = [],
+      actors = []
+     } = movie;
 
-  //   const createMovie = this.movieRepository.create({
-  //     name: name,
-  //     year:year
-  //   });
+    const createMovie = this.movieRepository.create({
+      name:name,
+      poster:poster,
+      bigPoster:bigPoster,
+      deskription:deskription,
+      year:year,
+      duration:duration,
+      country:country,
+      videoUrl:videoUrl,
+      actors:[],
+      genres:[]
+    });
+    
 
-  //   if (createMovie) {
-  //     return this.movieRepository.save(createMovie);
-  //   } else {
-  //     return 'Please,check validate on your fields';
-  //   }
-  // }
+    if (createMovie) {
+      return this.movieRepository.save(createMovie);
+    } else {
+      return 'Please,check validate on your fields';
+    }
+  }
 
   // async removeMovie(id: number) {
   //   const movie = this.movieRepository.delete(id);

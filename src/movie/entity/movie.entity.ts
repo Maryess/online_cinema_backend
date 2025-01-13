@@ -4,7 +4,8 @@ import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToO
 
 @Entity()
 export class Movie {
-  @PrimaryGeneratedColumn()
+  @Column({unique:true})
+  @PrimaryGeneratedColumn("uuid")
   id: number;
   @Column()
   poster:string;

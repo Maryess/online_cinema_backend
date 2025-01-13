@@ -26,12 +26,10 @@ export class MovieController {
   //   return this.MovieService.getMovieId(id);
   // }
 
-  // @Post()
-  // createMovie(@Body() movie: CreateMovieDto) {
-    // const movie = new Movie();
-    // Object.assign(movie, data);
-    // return this.MovieService.createMovie(movie);
-  // }
+  @Post()
+  createMovie(@Body() movie: CreateMovieDto) {
+    return this.MovieService.createMovie(movie);
+  }
 
   // @Delete()
   // deleteAllMovie() {
