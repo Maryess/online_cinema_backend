@@ -31,6 +31,13 @@ export class MovieController {
     return this.MovieService.createMovie(movie);
   }
 
+  @Post(':movieId/:ratingId')
+  updateRating(
+    @Param('movieId') movieId: string,
+    @Param('ratingId') ratingId:string) {
+    return this.updateRating(movieId,ratingId)
+  }
+
   // @Delete()
   // deleteAllMovie() {
   //   return this.MovieService.removeAllMovie();

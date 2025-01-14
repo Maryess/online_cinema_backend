@@ -72,7 +72,11 @@ export class ActorService {
   }
 
   async getAllActor() {
-    return this.actorRepository.find();
+    return this.actorRepository.find({
+      relations:{
+        movies:true
+      }
+    });
   }
 
   async getActorId(_id: string) {

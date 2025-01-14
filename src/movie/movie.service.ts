@@ -6,6 +6,7 @@ import { Movie } from './entity/movie.entity';
 import { Actor } from 'src/actor/entity/actor.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
 import { User } from 'src/user/entity/user.entity';
+import { Rating } from 'src/rating/entity/rating.entity';
 
 export class MovieService {
   constructor(
@@ -16,7 +17,9 @@ export class MovieService {
     @InjectRepository(Genre)
     private readonly genreRepository: Repository<Genre>,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Rating)
+    private readonly ratingRepository: Repository<Rating>
   ) {}
 
   async createMovie(movie:CreateMovieDto) {
@@ -30,7 +33,6 @@ export class MovieService {
       duration=0,
       country ='',
       videoUrl ='',
-      rating =4,
       actors:actorIds,
       genres:genreIds
      } = movie;
@@ -53,7 +55,6 @@ export class MovieService {
       duration:duration,
       country:country,
       videoUrl:videoUrl,
-      rating:rating,
       actors,
       genres
     });
@@ -80,6 +81,19 @@ export class MovieService {
         message:"Movie don't deleted"
       };
     }
+  }
+
+  async updateRating(movieId, ratingId){
+    const rating = await this.ratingRepository.findOneBy({id:ratingId})
+    if(!rating){
+      throw new Error ('Rating not found')
+    }
+    const movie = await this.movieRepository.findOneBy({id:movieId})
+    if(!movie){
+      throw new Error ('Movie not found')
+    }
+
+    movie.rating = rating
   }
 
   // async removeAllMovie() {

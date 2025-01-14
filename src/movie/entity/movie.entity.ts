@@ -1,7 +1,8 @@
 import { Actor } from 'src/actor/entity/actor.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
+import { Rating } from 'src/rating/entity/rating.entity';
 import { User } from 'src/user/entity/user.entity';
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from 'typeorm';
 
 @Entity('movies')
 export class Movie {
@@ -32,8 +33,9 @@ export class Movie {
   @Column()
   videoUrl:string;
   
-  @Column({default:4.0})
-  rating?:number;
+  @JoinColumn({name:'rating_id'})
+  @ManyToOne(()=>Rating,(rating)=>rating.movies)
+  rating:Rating;
 
   @Column({default:0})
   countOpened?:number;
