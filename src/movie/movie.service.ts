@@ -107,7 +107,10 @@ export class MovieService {
   // }
 
   async getAllMovies() {
-    return this.movieRepository.find();
+    return this.movieRepository.find({relations:{
+      actors:true,
+      genres:true
+    }});
   }
 
   // async getMovieId(id: number) {

@@ -12,17 +12,6 @@ export class Genre {
     slug:string;
 
     @ManyToMany(()=>Movie,(movie)=>movie.genres)
-    @JoinTable({
-        name:'movies_genres',
-        joinColumn:{
-            name:'movie_id',
-            referencedColumnName:'id'            
-        },
-        inverseJoinColumn:{
-            name:'genre_id',
-            referencedColumnName:'id'
-        }
-    })
     movies:Movie[]
     
     @CreateDateColumn()

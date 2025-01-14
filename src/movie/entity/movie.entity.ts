@@ -38,10 +38,32 @@ export class Movie {
   countOpened?:number;
   
   @ManyToMany(()=>Actor,(actor)=>actor.movies)
-  actors:Actor[]
+  @JoinTable({
+    name: 'actors_movies', 
+    joinColumn: {
+      name: 'movie_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'actor_id',
+      referencedColumnName: 'id',
+    },
+  })
+  actors: Actor[];
 
-  @ManyToMany(()=> Genre,(genre) => genre.movies)
-  genres:Genre[]
+  @ManyToMany(()=>Genre,(genre)=>genre.movies)
+  @JoinTable({
+    name: 'genre_movies', 
+    joinColumn: {
+      name: 'movie_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'genre_id',
+      referencedColumnName: 'id',
+    },
+  })
+  genres: Genre[];
   
   @CreateDateColumn()
   created_at: Date;

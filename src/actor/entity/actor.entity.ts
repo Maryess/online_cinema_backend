@@ -15,18 +15,8 @@ export class Actor {
   country:string;
   @Column()
   photo:string;
+  
   @ManyToMany(()=>Movie,(movie)=>movie.actors)
-  @JoinTable({
-    name: 'movies_actors', 
-    joinColumn: {
-      name: 'actor_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'movie_id',
-      referencedColumnName: 'id',
-    },
-  })
   movies: Movie[];
 
   @CreateDateColumn()
