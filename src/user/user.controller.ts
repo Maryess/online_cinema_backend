@@ -26,12 +26,13 @@ export class UserController {
   }
 
   @Delete(':id')
-  deleteUser(@Param('id') id: number) {
+  deleteUser(@Param('id') id: string) {
     return this.UserService.removeUser(id);
   }
 
-  @Patch(':id')
-  updateUser(@Param('id') id: number, @Body() data: UpdateUserDto) {
-    return this.UserService.updateUser(id, data);
+  @Post(':userId/favorites/:movieId')
+  updateUser(@Param('userId') userId: string,
+   @Param('movieId') movieId:string) {
+    return this.UserService.addMovieToFavorites(userId,movieId);
   }
 }

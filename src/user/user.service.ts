@@ -4,32 +4,40 @@ import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Movie } from 'src/movie/entity/movie.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Movie)
+    private readonly movieRepository: Repository<Movie> 
   ) {}
 
   async createUser(user: CreateUserDto) {
-    const { name, email, password } = user;
-    const createUser = this.userRepository.create({ name, email, password });
+    const { name, email, password, favorites:favoritesIds } = user;
+
+    const favorites = await this.movieRepository.find({
+      where: favoritesIds.map((id) => ({ id })),
+    });
+
+    const createUser = this.userRepository.create({ name, email, password,favorites});
 
     if (createUser) {
-      return {
-        message: 'User created',
-      };
+      return this.userRepository.save(createUser);
     }
 
-    return this.userRepository.save(user);
+   
   }
 
   async getAllUser() {
-    return this.userRepository.find();
+    return this.userRepository.find({relations:{
+      favorites:true
+    }});
   }
 
-  async removeUser(id: number) {
+  async removeUser(id: string) {
     const user = this.userRepository.findOne({
       where: {
         id: id,
@@ -49,14 +57,20 @@ export class UserService {
     }
   }
 
-  async updateUser(id: number, user: UpdateUserDto) {
-    const updateUser = this.userRepository.update(id, { ...user });
-
-    if (updateUser) {
-      return {
-        message: 'User updated',
-        id: `${id}`,
-      };
+  async addMovieToFavorites(userId: string, movieId: string){
+    const user = await this.userRepository.findOneBy({id: userId});
+    // if(!user) {
+    //   throw new Error('User not found')
+    // }
+    const movie = await this.movieRepository.findOneBy({id: movieId});
+    if(!movie) {
+      throw new Error('Movie not found')
     }
-  }
+    if (!user.favorites) {
+      user.favorites = [];
+    }
+    user.favorites.push(movie);
+    
+    return await this.userRepository.save(user);
+}
 }

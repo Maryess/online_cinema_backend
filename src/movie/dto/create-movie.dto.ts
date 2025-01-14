@@ -37,4 +37,8 @@ export class CreateMovieDto {
   @IsArray()
   @IsString({each:true})
   actors:string[];
+
+  @IsArray()
+  @IsString({each:true})
+  favorites:string[];
 }

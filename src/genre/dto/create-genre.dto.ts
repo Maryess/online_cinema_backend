@@ -8,5 +8,5 @@ export class CreateGenreDto{
     slug:string;
 
     @IsArray()
-    movies:string[]
+    movies?:string[]
 }

@@ -5,6 +5,7 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entity/movie.entity';
 import { Actor } from 'src/actor/entity/actor.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
+import { User } from 'src/user/entity/user.entity';
 
 export class MovieService {
   constructor(
@@ -13,7 +14,9 @@ export class MovieService {
     @InjectRepository(Actor)
     private readonly actorsRepository: Repository<Actor>,
     @InjectRepository(Genre)
-    private readonly genreRepository: Repository<Genre>
+    private readonly genreRepository: Repository<Genre>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
 
   async createMovie(movie:CreateMovieDto) {

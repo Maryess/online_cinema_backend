@@ -1,5 +1,6 @@
 import { Actor } from 'src/actor/entity/actor.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
+import { User } from 'src/user/entity/user.entity';
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from 'typeorm';
 
 @Entity('movies')
@@ -64,6 +65,9 @@ export class Movie {
     },
   })
   genres: Genre[];
+
+  @ManyToMany(()=>User, (user)=> user.favorites)
+  users: User[];
   
   @CreateDateColumn()
   created_at: Date;
