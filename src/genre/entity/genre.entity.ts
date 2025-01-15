@@ -1,14 +1,18 @@
-import { Column, CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-
+import { Movie } from "src/movie/entity/movie.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+@Entity('genres')
 export class Genre {
-    @PrimaryGeneratedColumn()
-    id:number;
+    @PrimaryGeneratedColumn("uuid")
+    id:string;
 
     @Column()
     name:string;
 
     @Column()
-    deskription:string;
+    slug:string;
+
+    @ManyToMany(()=>Movie,(movie)=>movie.genres)
+    movies:Movie[]
     
     @CreateDateColumn()
     created_at: Date;

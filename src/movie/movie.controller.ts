@@ -21,33 +21,21 @@ export class MovieController {
     return this.MovieService.getAllMovies();
   }
 
-  @Get(':id')
-  getMovieId(@Param('id') id: number) {
-    return this.MovieService.getMovieId(id);
-  }
-
   @Post()
   createMovie(@Body() movie: CreateMovieDto) {
-    // const movie = new Movie();
-    // Object.assign(movie, data);
     return this.MovieService.createMovie(movie);
   }
 
-  // @Delete()
-  // deleteAllMovie() {
-  //   return this.MovieService.removeAllMovie();
-  // }
+  @Post(':movieId/:ratingId')
+  updateRating(
+    @Param('movieId') movieId: string,
+    @Param('ratingId') ratingId:string) {
+    return this.updateRating(movieId,ratingId)
+  }
 
   @Delete(':id')
-  deleteMovie(@Param('id') id: number) {
-    
-    return this.MovieService.removeMovie(id)
-
-    
+  deleteMovie(@Param('id') _id: string) {
+    return this.MovieService.removeMovie(_id)
   }
 
-  @Patch(':id')
-  updateMovie(@Param() id: number, @Body() data: UpdateMovieDto) {
-    return this.MovieService.updateMovie(id, data);
-  }
 }

@@ -1,14 +1,76 @@
-import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from 'typeorm';
+import { Actor } from 'src/actor/entity/actor.entity';
+import { Genre } from 'src/genre/entity/genre.entity';
+import { Rating } from 'src/rating/entity/rating.entity';
+import { User } from 'src/user/entity/user.entity';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from 'typeorm';
 
-@Entity()
+@Entity('movies')
 export class Movie {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+  @Column()
+  poster:string; 
+
+  @Column()
+  bigPoster:string;
+  
   @Column()
   name: string;
+  
+  @Column()
+  slug: string;
+
+  @Column()
+  deskription:string;
+  
   @Column()
   year:number;
+  @Column()
+  duration:number;
+  @Column()
+  country:string;
+  
+  @Column()
+  videoUrl:string;
+  
+  @JoinColumn({name:'rating_id'})
+  @ManyToOne(()=>Rating,(rating)=>rating.movies)
+  rating:Rating;
 
+  @Column({default:0})
+  countOpened?:number;
+  
+  @ManyToMany(()=>Actor,(actor)=>actor.movies)
+  @JoinTable({
+    name: 'actors_movies', 
+    joinColumn: {
+      name: 'movie_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'actor_id',
+      referencedColumnName: 'id',
+    },
+  })
+  actors: Actor[];
+
+  @ManyToMany(()=>Genre,(genre)=>genre.movies)
+  @JoinTable({
+    name: 'genre_movies', 
+    joinColumn: {
+      name: 'movie_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'genre_id',
+      referencedColumnName: 'id',
+    },
+  })
+  genres: Genre[];
+
+  @ManyToMany(()=>User, (user)=> user.favorites)
+  users: User[];
+  
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

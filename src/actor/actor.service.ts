@@ -11,12 +11,14 @@ export class ActorService {
   ) {}
 
   async createActor(actor: CreateActorDto) {
-    const {lastName,firstName,year} = actor
+    const {name,slug,year,country,photo} = actor
 
     const createActor = this.actorRepository.create({
-      lastName:lastName,
-      firstName:firstName,
-      year:year
+      name:name,
+      slug:slug,
+      year:year,
+      country:country,
+      photo:photo
     });
 
     if (createActor) {
@@ -26,44 +28,48 @@ export class ActorService {
     }
   }
 
-  async removeActor(id: number) {
-    const actor = this.actorRepository.delete({ id: id });
+  async removeActor(_id: string) {
+    const actor = this.actorRepository.delete({ id: _id });
 
     if (actor) {
-      return 'Actor delete';
+      return {
+        message:'Actor deleted'};
     } else {
-      return 'Please,check validate on your fields';
+      return {
+        message:"Actor don't deleted"
+      };
     }
   }
 
-  // async removeAllActor(){
-  //   const getAllMovie = this.actorRepository.find()
+  async removeAllActor(){
+    const removeActors = this.actorRepository.remove
 
-  //   if(getAllMovie){
-  //     return this.actorRepository.delete({})
-  //   }else{
-  //     return {
-  //       message:'Movies deleted'
-  //     }
-  //   }
+    if(removeActors){
+      return {
+        message:'Actors deleted'
+      }
+    }
+  }
 
-  // }
-
-  async updateActor(id: number, actor: UpdateActorDto) {
-    const updateActor = this.actorRepository.update(id,{...actor});
+  async updateActor(_id: string, actor: UpdateActorDto) {
+    const updateActor = this.actorRepository.update(_id,{...actor});
 
     if (updateActor) {
-      return { message: 'Actor updated', id: `${id}` };
+      return { message: 'Actor updated', id: `${_id}` };
     } else {
       return 'Please,check validate on your fields';
     }
   }
 
   async getAllActor() {
-    return this.actorRepository.find();
+    return this.actorRepository.find({
+      relations:{
+        movies:true
+      }
+    });
   }
 
-  async getActorId(id: number) {
-    return this.actorRepository.findOne({ where: { id: id } });
+  async getActorId(_id: string) {
+    return this.actorRepository.findOne({ where: { id: _id } });
   }
 }

@@ -1,15 +1,23 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Movie } from 'src/movie/entity/movie.entity';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity()
+@Entity('actors')
 export class Actor {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
   @Column()
-  firstName: string;
+  name:string;
   @Column()
-  lastName:string;
+  slug:string;
   @Column()
   year:number;
+  @Column()
+  country:string;
+  @Column()
+  photo:string;
+  
+  @ManyToMany(()=>Movie,(movie)=>movie.actors)
+  movies: Movie[];
 
   @CreateDateColumn()
   created_at: Date;

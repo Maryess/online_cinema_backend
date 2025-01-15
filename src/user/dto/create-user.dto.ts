@@ -1,4 +1,5 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsArray, IsEmail, IsString, MinLength } from 'class-validator';
+import { Movie } from 'src/movie/entity/movie.entity';
 
 export class CreateUserDto {
   @MinLength(6, {
@@ -16,9 +17,8 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
-  refreshToken: string;
-  accessToken: string;
+  @IsArray()
+  favorites:string[]
 
-  createdAt: string;
-  updatedAt: string;
+  
 }
