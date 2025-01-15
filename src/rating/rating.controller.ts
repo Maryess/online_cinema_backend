@@ -10,15 +10,9 @@ export class RatingController {
     }
 
     @Post()
-    createRating(@Body() data: createRatingDto){
-        return this.RatingService.createRating(data)
+    addRatingToMovie(@Body() data: createRatingDto){
+        return this.RatingService.addRatingToMovie(data)
     }
-
-    @Post(':ratingId/movies/:movieId')
-  updateUser(@Param('ratingId') ratingId: string,
-   @Param('movieId') movieId:string) {
-    return this.RatingService.addRatingToMovie(ratingId,movieId);
-  }
 
     @Get()
     getAllRatings(){

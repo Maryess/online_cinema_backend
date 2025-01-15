@@ -10,16 +10,5 @@ export class Rating {
     value:number;
     
     @OneToMany(()=>Movie,(movie)=>movie.rating)
-    //  @JoinTable({
-    //     name: 'movies_ratings', 
-    //     joinColumn: {
-    //       name: 'rating_id',
-    //       referencedColumnName: 'id',
-    //     },
-    //     inverseJoinColumn: {
-    //       name: 'movie_id',
-    //       referencedColumnName: 'id',
-    //     },
-    //   })
     movies:Movie[]
 }

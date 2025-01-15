@@ -49,16 +49,6 @@ export class ActorService {
         message:'Actors deleted'
       }
     }
-    // if(getAllMovie){
-    //   return {
-    //     message:'Actors deleted'
-    //   }
-    // }else{
-    //   return {
-    //     message:'Actors didnt deleted'
-    //   }
-    // }
-
   }
 
   async updateActor(_id: string, actor: UpdateActorDto) {

@@ -96,41 +96,11 @@ export class MovieService {
     movie.rating = rating
   }
 
-  // async removeAllMovie() {
-  //   return this.movieRepository.remove;
-  // }
-
-  // async updateMovieId(){
-  //   let updateId = 0;
-  //   const movie = this.movieRepository.find();
-  //   (await movie).map((element)=>{
-  //     if(element.id != 1){
-  //       updateId = 1
-  //       element.id = updateId
-  //     }
-  //   })
-  //   return movie;
-  
-  // }
-
-  // async updateMovie(id: number, movie: UpdateMovieDto) {
-  //   const updateMovie = this.movieRepository.update(id, { ...movie });
-
-  //   if (updateMovie) {
-  //     return { message: 'Movie updated', id: `${id}` };
-  //   } else {
-  //     return 'Please,check validate on your fields';
-  //   }
-  // }
-
   async getAllMovies() {
     return this.movieRepository.find({relations:{
       actors:true,
-      genres:true
+      genres:true,
+      rating:true
     }});
   }
-
-  // async getMovieId(id: number) {
-  //   return this.movieRepository.findOne({ where: { id: id } });
-  // }
 }

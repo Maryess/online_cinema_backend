@@ -14,7 +14,7 @@ export class RatingService {
         private readonly movieRepository : Repository<Movie>
     ){}
 
-    async createRating(rating: createRatingDto){
+    async addRatingToMovie(rating: createRatingDto){
         const {value,movies:moviesIds} = rating;
       
         const movies = await this.movieRepository.find({
@@ -28,25 +28,6 @@ export class RatingService {
         }
 
         return this.ratingRepository.save(createRating)
-    }
-
-    async addRatingToMovie(movieId:string, ratingId:string){
-        
-        const movie = await this.movieRepository.findOneBy({
-            id:movieId
-        })
-
-        const rating = await this.ratingRepository.findOneBy({
-            id: ratingId
-        }) 
-
-        if(!rating.movies){
-            rating.movies = []
-        } 
-
-        rating.movies.push(movie)
-
-        return await this.ratingRepository.save(rating);
     }
 
     async getllRatings () {

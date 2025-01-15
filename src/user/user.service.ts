@@ -59,9 +59,6 @@ export class UserService {
 
   async addMovieToFavorites(userId: string, movieId: string){
     const user = await this.userRepository.findOneBy({id: userId});
-    // if(!user) {
-    //   throw new Error('User not found')
-    // }
     const movie = await this.movieRepository.findOneBy({id: movieId});
     if(!movie) {
       throw new Error('Movie not found')
