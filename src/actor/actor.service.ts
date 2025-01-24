@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { UpdateActorDto } from './dto/update-actor.dto';
 import { Actor } from './entity/actor.entity';
 import { CreateActorDto } from './dto/create-actor.dto';
+import { Movie } from 'src/movie/entity/movie.entity';
 
 export class ActorService {
   constructor(
@@ -11,9 +12,10 @@ export class ActorService {
   ) {}
 
   async createActor(actor: CreateActorDto) {
-    const {name,slug,year,country,photo} = actor
+    try{
+      const {name,slug,year,country,photo} = actor
 
-    const createActor = this.actorRepository.create({
+    const createActor = await this.actorRepository.create({
       name:name,
       slug:slug,
       year:year,
@@ -22,23 +24,35 @@ export class ActorService {
     });
 
     if (createActor) {
-      return this.actorRepository.save(createActor);
-    } else {
-      return 'Please,check validate on your fields';
+      return false
+    } 
+    return await this.actorRepository.save(createActor);
+    }catch{
+      return {
+        status:false
+      }
     }
+    
   }
 
-  async removeActor(_id: string) {
-    const actor = this.actorRepository.delete({ id: _id });
-
-    if (actor) {
-      return {
-        message:'Actor deleted'};
-    } else {
-      return {
-        message:"Actor don't deleted"
-      };
-    }
+  async removeActor(actorId: string) {
+    try {
+          const actor = await this.actorRepository.findOne({ where: { id: actorId }, relations: ['movies'] }); // relations: ['genres', 'actors']
+          if (!actor) {
+            return false; 
+          }
+    
+          await this.actorRepository.createQueryBuilder()
+            .relation(Actor, 'movies')
+            .of(actor)
+            .remove(actor.movies);
+    
+          await this.actorRepository.remove(actor);
+          return true;
+        } catch (error) {
+          console.error("Ошибка при удалении фильма:", error);
+          return false;
+        }
   }
 
   async removeAllActor(){
@@ -62,14 +76,28 @@ export class ActorService {
   }
 
   async getAllActor() {
-    return this.actorRepository.find({
-      relations:{
-        movies:true
+    try{
+      return this.actorRepository.find({
+        relations:{
+          movies:true
+        }
+      });
+    }catch{
+      return {
+        status:false
       }
-    });
+    }
+    
   }
 
   async getActorId(_id: string) {
-    return this.actorRepository.findOne({ where: { id: _id } });
+    try{
+      return await this.actorRepository.findOne({ where: { id: _id } });
+    }catch{
+      return {
+        status:false
+      }
+    }
+  
   }
 }

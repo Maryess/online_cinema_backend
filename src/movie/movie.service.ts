@@ -23,65 +23,86 @@ export class MovieService {
   ) {}
 
   async createMovie(movie:CreateMovieDto) {
-     const {
-      poster='',
-      bigPoster='',
-      name='',
-      slug='', 
-      deskription='',
-      year=0,
-      duration=0,
-      country ='',
-      videoUrl ='',
-      actors:actorIds,
-      genres:genreIds
-     } = movie;
-
-    const actors = await this.actorsRepository.find({
-      where: actorIds.map((id) => ({ id })),
-    });
-
-    const genres = await this.genreRepository.find({
-      where: genreIds.map((id)=>({id}))
-    })
-
-    const createMovie = this.movieRepository.create({
-      name:name,
-      slug:slug,
-      poster:poster,
-      bigPoster:bigPoster,
-      deskription:deskription,
-      year:year,
-      duration:duration,
-      country:country,
-      videoUrl:videoUrl,
-      actors,
-      genres
-    });
-    
-    if(createMovie){
-      return this.movieRepository.save(createMovie);
-    }else{
+    try{
+      const {
+        poster='',
+        bigPoster='',
+        name='',
+        slug='', 
+        deskription='',
+        year=0,
+        duration=0,
+        country ='',
+        videoUrl ='',
+        actors:actorIds,
+        genres:genreIds
+       } = movie;
+  
+      const actors = await this.actorsRepository.find({
+        where: actorIds.map((id) => ({ id })),
+      });
+  
+      const genres = await this.genreRepository.find({
+        where: genreIds.map((id)=>({id}))
+      })
+  
+      const createMovie = await this.movieRepository.create({
+        name:name,
+        slug:slug,
+        poster:poster,
+        bigPoster:bigPoster,
+        deskription:deskription,
+        year:year,
+        duration:duration,
+        country:country,
+        videoUrl:videoUrl,
+        actors,
+        genres
+      });
+      
+      if(!createMovie){
+        return false
+      }
+      return await this.movieRepository.save(createMovie);
+    }catch{
       return {
-        message:"Movie don't deleted"
-      };
+        status:false
+      }
+    }
+     
+  }
+
+  async removeMovie(movieId: string) {
+
+    try {
+      const movie = await this.movieRepository.findOne({ where: { id: movieId }, relations: ['genres', 'actors'] }); // relations: ['genres', 'actors']
+      if (!movie) {
+        return false; 
+      }
+      if(movie.actors.length && movie.genres.length === 0){
+        await this.movieRepository.remove(movie)
+        return true
+      }else{
+
+      await this.movieRepository.createQueryBuilder()
+        .relation(Movie, 'genres')
+        .of(movie)
+        .remove(movie.genres);
+
+      await this.movieRepository.createQueryBuilder()
+        .relation(Movie, 'actors')
+        .of(movie)
+        .remove(movie.actors);
+
+      await this.movieRepository.remove(movie);
+      return true;}
+    } catch (error) {
+      console.error("Ошибка при удалении фильма:", error);
+      return false;
     }
   }
 
-  async removeMovie(_id: string) {
-    const movie = this.movieRepository.delete(_id);
 
-    if (movie) {
-      return {
-        message:"Movie deleted",
-      };
-
-    } else {
-      return {
-        message:"Movie don't deleted"
-      };
-    }
-  }
 
   async updateRating(movieId, ratingId){
     const rating = await this.ratingRepository.findOneBy({id:ratingId})
@@ -97,10 +118,17 @@ export class MovieService {
   }
 
   async getAllMovies() {
-    return this.movieRepository.find({relations:{
-      actors:true,
-      genres:true,
-      rating:true
-    }});
+    try{ 
+      return this.movieRepository.find({relations:{
+        actors:true,
+        genres:true,
+        rating:true
+      }});
+    }catch{
+      return {
+        status:false
+      }
+    }
+   
   }
 }
