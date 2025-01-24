@@ -8,27 +8,61 @@ import { Movie } from 'src/movie/entity/movie.entity';
 export class GenreService {
   constructor(
     @InjectRepository(Genre)
-    private readonly genreRepository: Repository<Genre>,
-    @InjectRepository(Movie)
-    private readonly movieRepository: Repository<Movie>,
+    private readonly genreRepository: Repository<Genre>
   ) {}
 
   async createGenre(Genre: CreateGenreDto) {
-    const { name='',slug='',movies:movieIds} = Genre;
+    try{
+      const { name='',slug='',movies:movieIds} = Genre;
 
-    const createGenre = this.genreRepository.create({
-      name: name,
-      slug:slug,
-    });
+      const createGenre = await this.genreRepository.create({
+        name: name,
+        slug:slug,
+      });
+  
+      if(!createGenre){
+        return {
+          status:false
+        }
+      }
 
-    if (createGenre) {
-      return this.genreRepository.save(createGenre);
-    } else {
-      return 'Please,check validate on your fields';
+      return {
+        data: await this.genreRepository.save(createGenre),
+        status:true
+      }
+    }catch{
+      return {status:false}
     }
+  
   }
 
   async getAllGenres() {
-    return this.genreRepository.find();
+    try{
+      const genres = await this.genreRepository.find()
+
+      if(!genres){
+        return false
+      }
+
+      return genres
+    }catch{
+      return {
+        status:false
+      }
+    }
+  }
+
+  async deleteGenreById(genreID:string){
+    try {
+      const genre = await this.genreRepository.findOne({where:{id:genreID}})
+      if(!genre){
+        return false
+      }
+
+      await this.genreRepository.remove(genre)
+      return true
+    }catch{
+      return false
+    }
   }
 }

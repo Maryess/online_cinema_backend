@@ -24,9 +24,15 @@ export class GenreController {
     .getAllGenres();
   }
 
+
   @Post()
   createGenre(@Body() genre: CreateGenreDto) {
     return this.GenreService
     .createGenre(genre);
+  }
+
+  @Delete('/:id')
+  deleteGenreById(@Param() id:string){
+    return this.GenreService.deleteGenreById(id)
   }
 }
