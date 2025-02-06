@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entity/user.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AccessTokenStrategy } from './accessToken.strategy';
+import { RefreshTokenStrategy } from './refreshToken.strategy';
+import { UserModule } from 'src/user/user.module';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -14,9 +18,11 @@ import { AuthService } from './auth.service';
       },
     }),
     TypeOrmModule.forFeature([User]),
+    UserModule
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy,ConfigService],
   exports: [AuthService],
+
 })
 export class AuthModule {}

@@ -14,6 +14,8 @@ export class User {
   password: string;
   @Column()
   access_token: string;
+  @Column()
+  refresh_token:string;
   @ManyToMany(()=>Movie,(movie)=>movie.users)
   @JoinTable({
     name: 'users_favorite_movies', 

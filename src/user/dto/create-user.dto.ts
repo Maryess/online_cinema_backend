@@ -20,5 +20,7 @@ export class CreateUserDto {
   @IsArray()
   favorites:string[]
 
+  @IsString()
+  refreshToken:string;
   
 }
