@@ -17,13 +17,23 @@ export class MovieController {
   constructor(private readonly MovieService: MovieService) {}
 
   @Get()
-  getAllMovie() {
-    return this.MovieService.getAllMovies();
+  async getAllMovie() {
+    return await this.MovieService.getAllMovies();
+  }
+
+  @Get('popular-movie')
+  async getPopularMovie(){
+    return await this.MovieService.getPopularMovie();
+  }
+
+  @Get(':slug')
+  async getMovieBySlug(@Param('slug') slug:string){
+    return await this.MovieService.getMovieBySlug(slug)
   }
 
   @Post()
-  createMovie(@Body() movie: CreateMovieDto) {
-    return this.MovieService.createMovie(movie);
+  async createMovie(@Body() movie: CreateMovieDto) {
+    return await this.MovieService.createMovie(movie);
   }
 
   @Post(':movieId/:ratingId')
@@ -34,8 +44,8 @@ export class MovieController {
   }
 
   @Delete(':id')
-  deleteMovie(@Param('id') _id: string) {
-    return this.MovieService.removeMovie(_id)
+  async deleteMovie(@Param('id') _id: string) {
+    return await this.MovieService.removeMovie(_id)
   }
 
 }
