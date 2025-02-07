@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt'
+import { ConfigService } from '@nestjs/config';
+import { AuthDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,39 +14,39 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async register(user: CreateUserDto) {
     const { email, password, name } = user;
-
-    const payload = { username: name };
-    const access_token = this.jwtService.sign(payload);
+    const salt = await bcrypt.genSalt()
+    const hashPassword = await bcrypt.hash(password, salt)
+    
     const createUser = this.userRepository.create({
       name,
-      password,
+      password:hashPassword,
       email,
-      access_token,
+      
     });
+
+    const tokens = await this.getTokens(createUser.id, createUser.name);
+    await this.updateRefreshToken(createUser.id, tokens.refreshToken);
+    return tokens;
 
     return this.userRepository.save(createUser);
   }
 
-  async auth(user: CreateUserDto) {
-    const { email, name, password } = user;
-
-    const getUser = this.userRepository.findOne({
-      where: {
-        name: name,
-        email: email,
-        password: password,
-      },
-    });
-
-    if (getUser) {
-      return getUser;
-    } else {
-      return new Error('Please, check your fields on valid');
-    }
+  async auth(auth: AuthDto) {
+    const getUser = await this.userRepository.findOne({where:{
+      name:auth.name
+    }});
+    if (!getUser) throw new BadRequestException('User does not exist');
+    const passwordMatches = await bcrypt.compare(getUser.password, auth.password);
+    if (!passwordMatches)
+      throw new BadRequestException('Password is incorrect');
+    const tokens = await this.getTokens(getUser.id, getUser.name);
+    await this.updateRefreshToken(getUser.id, tokens.refreshToken);
+    return tokens;
   }
 
   async verifyToken(user: CreateUserDto) {
@@ -59,4 +62,46 @@ export class AuthService {
       }
     });
   }
+
+  async getTokens(userId: string, username: string) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          username,
+        },
+        {
+          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+          expiresIn: '15m',
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          username,
+        },
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+          expiresIn: '7d',
+        },
+      ),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    const hashedRefreshToken = await this.hashData(refreshToken,'fsgsysffsdgvx');
+    await this.userRepository.update(userId, {
+      refresh_token:hashedRefreshToken
+    });
+  }
+
+  hashData(data: string,token:string) {
+    return bcrypt.hash(data,token);
+  }
+
 }

@@ -131,4 +131,52 @@ export class MovieService {
     }
    
   }
+
+  async getPopularMovie () {
+    try{
+
+      let message = ''
+      const findAll = await this.movieRepository.find()
+
+      findAll.map((movie)=>{
+       movie.countOpened === 0 ? message= 'not found': message ='found'
+
+      })
+
+      return{
+        message
+      }
+
+    }catch{
+      return{
+        status:false
+      }
+    }
+  }
+
+  async getMovieBySlug(slug:string){
+    try {
+      const movie = await this.movieRepository.find({
+        where: {
+          slug: slug,
+        },
+      });
+
+      if (!movie || movie.length === 0) { // Проверка на пустой массив
+        return {
+          message: 'movie not found',
+        };
+      }
+
+      return {
+        message: 'movie found',
+        movie,
+      };
+    } catch (error) {
+      console.error("Error fetching movie:", error); // Логируйте ошибку
+      return {
+        status: false,
+      };
+    }
+  }
 }
