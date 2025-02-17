@@ -35,16 +35,30 @@ export class AuthService {
       refresh_token:''
     });
   
-    const savedUser = await this.userRepository.save(createUser); 
+    await this.userRepository.save(createUser); 
     
-    return savedUser
+    const tokens = await this.isTokenKey(createUser.id)
+
+    return{user:this.returnUserFields(createUser),
+      ...tokens
+    }
   }catch(error){
     return{message:error}
   }
   }
 
   async auth(data: AuthDto) {
-    return this.validate(data)
+    try{
+    const user =await this.validate(data)
+
+    const tokens = await this.isTokenKey(user.id)
+
+    return{user:this.returnUserFields(user),
+      ...tokens
+    }
+    }catch(error){
+      return{message:error}
+    }
   }
 
   async validate(data:AuthDto){
@@ -55,6 +69,31 @@ export class AuthService {
     if(!isValidPassword) throw new UnauthorizedException('Password is not correct') 
 
     return user
+  }
+
+  async isTokenKey(userId:string){
+    try{
+    const data = {id:userId}
+
+    const refreshTOken = await this.jwtService.signAsync(data,{
+      expiresIn:'15d'
+    })
+
+    const accessToken = await this.jwtService.signAsync(data,{
+      expiresIn:'15h'
+    })
+
+    return{refreshTOken,accessToken}
+  }catch(error){
+    return{message:error}
+  }
+  }
+
+  returnUserFields(user:User){
+    return{
+      id:user.id,
+      email:user.email
+    }
   }
 
 }
