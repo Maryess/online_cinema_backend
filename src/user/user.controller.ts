@@ -30,6 +30,11 @@ export class UserController {
     return this.UserService.removeUser(id);
   }
 
+  @Delete()
+  deleteAllUsers(){
+    return this.UserService.deleteAllUsers()
+  }
+
   @Post(':userId/favorites/:movieId')
   updateUser(@Param('userId') userId: string,
    @Param('movieId') movieId:string) {

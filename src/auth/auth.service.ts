@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt'
 import { ConfigService } from '@nestjs/config';
 import { AuthDto } from './dto/auth.dto';
+import { RefreshTokenDto } from './dto/refreshToken.dto';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +33,8 @@ export class AuthService {
       email:data.email,
       name:'',
       access_token:'',
-      refresh_token:''
+      refresh_token:'',
+      isAdmin:false
     });
   
     await this.userRepository.save(createUser); 
@@ -58,6 +60,26 @@ export class AuthService {
     }
     }catch(error){
       return{message:error}
+    }
+  }
+
+  async getNewTokens({refreshToken}:RefreshTokenDto){
+    try{
+    if(!refreshToken) throw new UnauthorizedException('Please, sign in!')
+
+    const result = await this.jwtService.verifyAsync(refreshToken)
+    if(!result) throw new UnauthorizedException('Invalid token')
+
+    const user = await this.userRepository.findOneBy({id:result.id})
+    const tokens = await this.isTokenKey(user.id)
+
+    return {
+      user:this.returnUserFields(user)
+      ,...tokens}
+    }catch(error){
+      return{
+        message:error
+      }
     }
   }
 
@@ -92,8 +114,11 @@ export class AuthService {
   returnUserFields(user:User){
     return{
       id:user.id,
-      email:user.email
+      email:user.email,
+      isAdmin:user.isAdmin
     }
   }
+
+  
 
 }
