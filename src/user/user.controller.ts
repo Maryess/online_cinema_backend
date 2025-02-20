@@ -10,6 +10,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
 @Controller('/user')
 export class UserController {
@@ -18,6 +19,12 @@ export class UserController {
   @Get()
   getAllUser() {
     return this.UserService.getAllUser();
+  }
+
+  @Get('profile')
+  @Auth('admin')
+  getUser(){
+    return this.UserService.getUser()
   }
 
   @Post()

@@ -14,9 +14,13 @@ import { GenreModule } from './genre/genre.module';
 import { Genre } from './genre/entity/genre.entity';
 import { RatingModule } from './rating/rating.module';
 import { Rating } from './rating/entity/rating.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // Make ConfigModule available globally
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

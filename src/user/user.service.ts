@@ -30,11 +30,15 @@ export class UserService {
 
    
   }
-
+  
   async getAllUser() {
     return this.userRepository.find({relations:{
       favorites:true
     }});
+  }
+
+  async getUser(){
+    return {email:'fsgd'}
   }
 
   async removeUser(id: string) {
