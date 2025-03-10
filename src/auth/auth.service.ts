@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt'
 import { ConfigService } from '@nestjs/config';
 import { AuthDto } from './dto/auth.dto';
+import { RefreshTokenDto } from './dto/refreshToken.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,91 +18,107 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async register(user: CreateUserDto) {
-    const { email, password, name } = user;
-    const salt = await bcrypt.genSalt()
-    const hashPassword = await bcrypt.hash(password, salt)
+  async register(data: AuthDto) {
+    try{
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(data.password, salt);
     
+    const oldUser = await this.userRepository.findOneBy({email:data.email})
+    if(oldUser){
+      throw new BadRequestException('User with this email is already in the system ')
+    }
+
     const createUser = this.userRepository.create({
-      name,
-      password:hashPassword,
-      email,
-      
+      password: hashPassword,
+      email:data.email,
+      name:'',
+      access_token:'',
+      refresh_token:'',
+      isAdmin:false
     });
+  
+    await this.userRepository.save(createUser); 
+    
+    const tokens = await this.isTokenKey(createUser.id)
 
-    const tokens = await this.getTokens(createUser.id, createUser.name);
-    await this.updateRefreshToken(createUser.id, tokens.refreshToken);
-    return tokens;
-
-    return this.userRepository.save(createUser);
+    return{user:this.returnUserFields(createUser),
+      ...tokens
+    }
+  }catch(error){
+    return{message:error}
+  }
   }
 
-  async auth(auth: AuthDto) {
-    const getUser = await this.userRepository.findOne({where:{
-      name:auth.name
-    }});
-    if (!getUser) throw new BadRequestException('User does not exist');
-    const passwordMatches = await bcrypt.compare(getUser.password, auth.password);
-    if (!passwordMatches)
-      throw new BadRequestException('Password is incorrect');
-    const tokens = await this.getTokens(getUser.id, getUser.name);
-    await this.updateRefreshToken(getUser.id, tokens.refreshToken);
-    return tokens;
+  async auth(data: AuthDto) {
+    try{
+    const user =await this.validate(data)
+
+    const tokens = await this.isTokenKey(user.id)
+
+    return{user:this.returnUserFields(user),
+      ...tokens
+    }
+    }catch(error){
+      return{message:error}
+    }
   }
 
-  async verifyToken(user: CreateUserDto) {
-    const { name, email } = user;
-    const allUsers = this.userRepository.find();
-    (await allUsers).map((user) => {
-      if (user.access_token === null) {
-        const payload = { name: name, email: email };
-        const refresh_token = this.jwtService.sign(payload);
-        return this.userRepository.update(user.id, {
-          access_token: refresh_token,
-        });
-      }
-    });
-  }
+  async getNewTokens({refreshToken}:RefreshTokenDto){
+    try{
+    if(!refreshToken) throw new UnauthorizedException('Please, sign in!')
 
-  async getTokens(userId: string, username: string) {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(
-        {
-          sub: userId,
-          username,
-        },
-        {
-          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-          expiresIn: '15m',
-        },
-      ),
-      this.jwtService.signAsync(
-        {
-          sub: userId,
-          username,
-        },
-        {
-          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-          expiresIn: '7d',
-        },
-      ),
-    ]);
+    const result = await this.jwtService.verifyAsync(refreshToken)
+    if(!result) throw new UnauthorizedException('Invalid token')
+
+    const user = await this.userRepository.findOneBy({id:result.id})
+    const tokens = await this.isTokenKey(user.id)
 
     return {
-      accessToken,
-      refreshToken,
-    };
+      user:this.returnUserFields(user)
+      ,...tokens}
+    }catch(error){
+      return{
+        message:error
+      }
+    }
   }
 
-  async updateRefreshToken(userId: string, refreshToken: string) {
-    const hashedRefreshToken = await this.hashData(refreshToken,'fsgsysffsdgvx');
-    await this.userRepository.update(userId, {
-      refresh_token:hashedRefreshToken
-    });
+  async validate(data:AuthDto){
+    const user = await this.userRepository.findOneBy({email:data.email})
+    if(!user) throw new UnauthorizedException('User not found')
+
+    const isValidPassword = await bcrypt.compare(data.password, user.password)
+    if(!isValidPassword) throw new UnauthorizedException('Password is not correct') 
+
+    return user
   }
 
-  hashData(data: string,token:string) {
-    return bcrypt.hash(data,token);
+  async isTokenKey(userId:string){
+    try{
+    const data = {id:userId}
+
+    const refreshTOken = await this.jwtService.signAsync(data,{
+      expiresIn:'15d'
+    })
+
+    const accessToken = await this.jwtService.signAsync(data,{
+      expiresIn:'15h'
+    })
+
+    return{refreshTOken,accessToken}
+  }catch(error){
+    return{message:error}
   }
+  }
+
+  returnUserFields(user:User){
+    return{
+      id:user.id,
+      email:user.email,
+      isAdmin:user.isAdmin
+    }
+  }
+
+  
 
 }

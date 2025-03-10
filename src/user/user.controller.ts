@@ -10,6 +10,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
 @Controller('/user')
 export class UserController {
@@ -20,6 +21,12 @@ export class UserController {
     return this.UserService.getAllUser();
   }
 
+  @Get('profile')
+  @Auth('admin')
+  getUser(){
+    return this.UserService.getUser()
+  }
+
   @Post()
   createUser(@Body() data: CreateUserDto) {
     return this.UserService.createUser(data);
@@ -28,6 +35,11 @@ export class UserController {
   @Delete(':id')
   deleteUser(@Param('id') id: string) {
     return this.UserService.removeUser(id);
+  }
+
+  @Delete()
+  deleteAllUsers(){
+    return this.UserService.deleteAllUsers()
   }
 
   @Post(':userId/favorites/:movieId')

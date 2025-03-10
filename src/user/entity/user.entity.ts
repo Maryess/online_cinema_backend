@@ -16,6 +16,8 @@ export class User {
   access_token: string;
   @Column()
   refresh_token:string;
+  @Column()
+  isAdmin:boolean;
   @ManyToMany(()=>Movie,(movie)=>movie.users)
   @JoinTable({
     name: 'users_favorite_movies', 
@@ -29,6 +31,7 @@ export class User {
     },
     })
     favorites: Movie[];
+  
 
   @CreateDateColumn()
   created_at: Date;

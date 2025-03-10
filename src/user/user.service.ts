@@ -30,11 +30,15 @@ export class UserService {
 
    
   }
-
+  
   async getAllUser() {
     return this.userRepository.find({relations:{
       favorites:true
     }});
+  }
+
+  async getUser(){
+    return {email:'fsgd'}
   }
 
   async removeUser(id: string) {
@@ -69,5 +73,18 @@ export class UserService {
     user.favorites.push(movie);
     
     return await this.userRepository.save(user);
-}
+  }
+
+  async deleteAllUsers(){
+    try{
+     await this.userRepository.createQueryBuilder().delete().from(User).execute()
+     return{
+      message:'Users deleted'
+     }
+    }catch(error){
+      return{
+        message:error
+      }
+    }
+  }
 }
