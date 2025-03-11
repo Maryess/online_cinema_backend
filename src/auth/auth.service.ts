@@ -18,23 +18,18 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
+  async findByEmail (email:string) {
+    return this.userRepository.findOneBy({email:email})
+  }
+
   async register(data: AuthDto) {
     try{
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(data.password, salt);
     
-    const oldUser = await this.userRepository.findOneBy({email:data.email})
-    if(oldUser){
-      throw new BadRequestException('User with this email is already in the system ')
-    }
-
     const createUser = this.userRepository.create({
       password: hashPassword,
-      email:data.email,
-      name:'',
-      access_token:'',
-      refresh_token:'',
-      isAdmin:false
+      email:data.email
     });
   
     await this.userRepository.save(createUser); 

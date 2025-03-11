@@ -15,21 +15,6 @@ export class UserService {
     private readonly movieRepository: Repository<Movie> 
   ) {}
 
-  async createUser(user: CreateUserDto) {
-    const { name, email, password, favorites:favoritesIds } = user;
-
-    const favorites = await this.movieRepository.find({
-      where: favoritesIds.map((id) => ({ id })),
-    });
-
-    const createUser = this.userRepository.create({ name, email, password,favorites});
-
-    if (createUser) {
-      return this.userRepository.save(createUser);
-    }
-
-   
-  }
   
   async getAllUser() {
     return this.userRepository.find({relations:{

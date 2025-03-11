@@ -23,9 +23,6 @@ export class ActorService {
       photo:photo
     });
 
-    if (createActor) {
-      return false
-    } 
     return await this.actorRepository.save(createActor);
     }catch{
       return {

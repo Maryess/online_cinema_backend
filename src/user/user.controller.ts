@@ -27,11 +27,6 @@ export class UserController {
     return this.UserService.getUser()
   }
 
-  @Post()
-  createUser(@Body() data: CreateUserDto) {
-    return this.UserService.createUser(data);
-  }
-
   @Delete(':id')
   deleteUser(@Param('id') id: string) {
     return this.UserService.removeUser(id);
