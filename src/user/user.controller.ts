@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -32,12 +33,27 @@ export class UserController {
     return this.UserService.removeUser(id);
   }
 
+  @Get(':id')
+  getUserByID(@Param('id') id: string) {
+    return this.UserService.getUserById(id);
+  }
+
+  @Get('favorites/:id')
+  getAllFavoritesMovie(@Param('id') id:string){
+    return this.UserService.getAllFavoritesMovies(id)
+  }
+
+  @Put(':id')
+  updateAdminRole(@Param('id') id: string, @Body() admin:boolean) {
+    return this.UserService.updateAdminRole(id);
+  }
+
   @Delete()
   deleteAllUsers(){
     return this.UserService.deleteAllUsers()
   }
 
-  @Post(':userId/favorites/:movieId')
+  @Put(':userId/favorites/:movieId')
   updateUser(@Param('userId') userId: string,
    @Param('movieId') movieId:string) {
     return this.UserService.addMovieToFavorites(userId,movieId);

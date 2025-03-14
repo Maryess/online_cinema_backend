@@ -22,12 +22,22 @@ export class UserService {
     }});
   }
 
+  async getUserById(id:string){
+    return await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    
+  }
+
   async getUser(){
     return {email:'fsgd'}
   }
 
   async removeUser(id: string) {
-    const user = this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: {
         id: id,
       },
@@ -47,7 +57,7 @@ export class UserService {
   }
 
   async addMovieToFavorites(userId: string, movieId: string){
-    const user = await this.userRepository.findOneBy({id: userId});
+    try{const user = await this.userRepository.findOneBy({id: userId});
     const movie = await this.movieRepository.findOneBy({id: movieId});
     if(!movie) {
       throw new Error('Movie not found')
@@ -57,7 +67,29 @@ export class UserService {
     }
     user.favorites.push(movie);
     
-    return await this.userRepository.save(user);
+    return await this.userRepository.save(user);}
+    catch(error){
+      return {
+        message:'User dont updated'
+      }
+    }
+  }
+
+  async getAllFavoritesMovies(userId:string){
+    try{
+      const user = await this.userRepository.findOne({where:{id:userId},
+      relations:{
+        favorites:true
+      }})
+      return {
+        movies: user.favorites
+      }
+    }catch(error){
+      return{
+        message:'Error',
+        error: error
+      }
+    }
   }
 
   async deleteAllUsers(){
@@ -68,6 +100,19 @@ export class UserService {
      }
     }catch(error){
       return{
+        message:error
+      }
+    }
+  }
+
+  async updateAdminRole(id:string){
+    try{
+     
+      return await this.userRepository.update(id,{isAdmin:true})
+
+      
+    }catch(error){
+      return {
         message:error
       }
     }
