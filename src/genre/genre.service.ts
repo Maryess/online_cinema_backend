@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Genre } from './entity/genre.entity';
 import { CreateGenreDto } from './dto/create-genre.dto';
-import { Movie } from 'src/movie/entity/movie.entity';
+import { UpdateGenreDto } from './dto/update-genre.dto';
 
 
 export class GenreService {
@@ -36,6 +36,20 @@ export class GenreService {
   
   }
 
+  async genGenreById(genreId:string){
+    try{
+      const genre = await this.genreRepository.find({where:{
+        id:genreId
+      }})
+
+      return genre
+    }catch(error){
+      return {
+        error: error
+      }
+    }
+  }
+
   async getAllGenres() {
     try{
       const genres = await this.genreRepository.find()
@@ -48,6 +62,21 @@ export class GenreService {
     }catch{
       return {
         status:false
+      }
+    }
+  }
+
+  async updateGenre(genreId:string, data:UpdateGenreDto){
+    try{
+      const genre = await this.genreRepository.find({where:{
+        id:genreId
+      }})
+
+     const newGenre =  await this.genreRepository.update(genreId, {...data})
+      return newGenre
+    }catch(error){
+      return {
+        error: error
       }
     }
   }

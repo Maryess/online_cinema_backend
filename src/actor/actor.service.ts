@@ -3,7 +3,6 @@ import { Repository } from 'typeorm';
 import { UpdateActorDto } from './dto/update-actor.dto';
 import { Actor } from './entity/actor.entity';
 import { CreateActorDto } from './dto/create-actor.dto';
-import { Movie } from 'src/movie/entity/movie.entity';
 
 export class ActorService {
   constructor(
@@ -62,14 +61,17 @@ export class ActorService {
     }
   }
 
-  async updateActor(_id: string, actor: UpdateActorDto) {
-    const updateActor = this.actorRepository.update(_id,{...actor});
+  async updateActor(actorId: string, data: UpdateActorDto) {
+    try{
+      const updateActor = this.actorRepository.update(actorId,{...data});
 
-    if (updateActor) {
-      return { message: 'Actor updated', id: `${_id}` };
-    } else {
-      return 'Please,check validate on your fields';
+     return updateActor
+    }catch(error){
+      return {
+        error: error
+      }
     }
+    
   }
 
   async getAllActor() {

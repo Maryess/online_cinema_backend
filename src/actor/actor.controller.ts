@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
 } from '@nestjs/common';
 import { ActorService } from './actor.service';
 import { CreateActorDto } from './dto/create-actor.dto';
@@ -41,10 +42,8 @@ export class ActorController {
     return this.ActorService.removeAllActor()
   }
 
-  @Patch(':id')
+  @Put(':id')
   updateActor(@Param('id') _id: string, @Body() data: UpdateActorDto) {
-    const actor = new Actor();
-    Object.assign(actor, data);
     return this.ActorService.updateActor(_id, data);
   }
 }
