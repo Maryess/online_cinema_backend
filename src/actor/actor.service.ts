@@ -46,7 +46,7 @@ export class ActorService {
           await this.actorRepository.remove(actor);
           return true;
         } catch (error) {
-          console.error("Ошибка при удалении фильма:", error);
+          console.error("Ошибка при удалении актера:", error);
           return false;
         }
   }

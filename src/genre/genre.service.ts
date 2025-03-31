@@ -3,12 +3,15 @@ import { Repository } from 'typeorm';
 import { Genre } from './entity/genre.entity';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
+import { Movie } from 'src/movie/entity/movie.entity';
 
 
 export class GenreService {
   constructor(
     @InjectRepository(Genre)
-    private readonly genreRepository: Repository<Genre>
+    private readonly genreRepository: Repository<Genre>,
+    @InjectRepository(Movie)
+    private readonly movieRepository: Repository<Movie>
   ) {}
 
   async createGenre(Genre: CreateGenreDto) {
@@ -83,15 +86,19 @@ export class GenreService {
 
   async deleteGenreById(genreID:string){
     try {
-      const genre = await this.genreRepository.findOne({where:{id:genreID}})
+      const genre =await this.genreRepository.findOneBy({id:genreID});
       if(!genre){
         return false
       }
 
+      // await this.movieRepository.delete({genres: genre});
+
       await this.genreRepository.remove(genre)
-      return true
-    }catch{
-      return false
+       return true
+    }catch(error){
+      return {
+        error:error
+      }
     }
   }
 }

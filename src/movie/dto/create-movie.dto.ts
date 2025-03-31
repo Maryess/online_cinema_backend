@@ -40,5 +40,5 @@ export class CreateMovieDto {
 
   @IsArray()
   @IsString({each:true})
-  favorites:string[];
+  favorites?:string[];
 }

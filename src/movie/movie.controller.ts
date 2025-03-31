@@ -6,11 +6,11 @@ import {
   Param,
   Patch,
   Post,
+  Put,
 } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
-import { UpdateMovieDto } from './dto/update-movie.dto';
-import { Movie } from './entity/movie.entity';
 import { MovieService } from './movie.service';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 
 @Controller('/movie')
 export class MovieController {
@@ -36,14 +36,19 @@ export class MovieController {
     return await this.MovieService.createMovie(movie);
   }
 
-  @Post(':movieId/:ratingId')
+  @Post('/:movieId/:ratingId')
   updateRating(
     @Param('movieId') movieId: string,
     @Param('ratingId') ratingId:string) {
     return this.updateRating(movieId,ratingId)
   }
 
-  @Delete(':id')
+  @Put('/:movieId')
+  updateMovie(@Param('movieId') movieId:string, @Body() data:CreateMovieDto){
+    return this.MovieService.update(movieId,data)
+  }
+
+  @Delete('/:id')
   async deleteMovie(@Param('id') _id: string) {
     return await this.MovieService.removeMovie(_id)
   }

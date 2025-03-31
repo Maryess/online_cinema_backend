@@ -44,7 +44,7 @@ export class GenreController {
   }
 
   @Delete('/:id')
-  deleteGenreById(@Param() id:string){
+  deleteGenreById(@Param('id') id:string){
     return this.GenreService.deleteGenreById(id)
   }
 }
