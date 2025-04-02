@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entity/user.entity';
-import { Repository } from 'typeorm';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Movie } from 'src/movie/entity/movie.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -30,10 +31,6 @@ export class UserService {
     });
 
     
-  }
-
-  async getUser(){
-    return {email:'fsgd'}
   }
 
   async removeUser(id: string) {
@@ -93,16 +90,16 @@ export class UserService {
   }
 
   async deleteAllUsers(){
-    try{
-     await this.userRepository.createQueryBuilder().delete().from(User).execute()
-     return{
-      message:'Users deleted'
-     }
-    }catch(error){
-      return{
-        message:error
-      }
+  try{
+    await this.userRepository.createQueryBuilder().delete().from(User).execute()
+    return{
+    message:'Users deleted'
     }
+  }catch(error){
+    return{
+      message:error
+    }
+  }
   }
 
   async updateAdminRole(id:string){
@@ -115,6 +112,16 @@ export class UserService {
       return {
         message:error
       }
+    }
+  }
+
+  async update(userId:string, data:UpdateUserDto){
+    try{
+      const user = await this.userRepository.findOneBy({id:userId})
+
+      return await this.userRepository.update(userId, {...data})
+    }catch(error){
+      return error
     }
   }
 }

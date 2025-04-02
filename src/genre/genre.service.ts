@@ -53,19 +53,24 @@ export class GenreService {
     }
   }
 
-  async getAllGenres() {
-    try{
-      const genres = await this.genreRepository.find()
+  async getAllGenres(searchTerm?:string) {
+    const queryBuilder = this.genreRepository
+      .createQueryBuilder('genre')
+      .where('genre.deleted_at IS NULL');
 
-      if(!genres){
-        return false
-      }
+    if (searchTerm) {
+      queryBuilder.andWhere(
+        "to_tsvector('english', genre.name || ' ' || genre.slug ) @@ plainto_tsquery('english', :searchTerm)",
+        { searchTerm },
+      );
+    }
 
-      return genres
-    }catch{
-      return {
-        status:false
-      }
+    try {
+      const genres = await queryBuilder.getMany();
+      return genres;
+    } catch (error) {
+      console.error('Error fetching genres:', error);
+      throw error;
     }
   }
 
@@ -90,15 +95,34 @@ export class GenreService {
       if(!genre){
         return false
       }
-
       // await this.movieRepository.delete({genres: genre});
-
       await this.genreRepository.remove(genre)
-       return true
+      return true
     }catch(error){
-      return {
-        error:error
-      }
+      return error
     }
+  }
+
+  async deleteAllGenres(){
+    try{
+
+      const genres = await this.genreRepository.find()
+
+      for(const genre of genres){
+        await this.genreRepository
+        .createQueryBuilder()
+        .relation(Genre, 'movies') 
+        .of(genres)
+        .remove(genre.movies);
+      }
+         await this.genreRepository.remove(genres)
+         return{
+          message:'Genres deleted'
+         }
+        }catch(error){
+          return{
+            message:error
+          }
+        }
   }
 }

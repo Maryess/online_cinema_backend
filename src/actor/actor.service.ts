@@ -12,7 +12,7 @@ export class ActorService {
 
   async createActor(actor: CreateActorDto) {
     try{
-      const {name,slug,year,country,photo} = actor
+      const {name ='',slug='',year=0,country='',photo=''} = actor
 
     const createActor = await this.actorRepository.create({
       name:name,

@@ -22,11 +22,11 @@ export class UserController {
     return this.UserService.getAllUser();
   }
 
-  @Get('profile')
-  @Auth('admin')
-  getUser(){
-    return this.UserService.getUser()
-  }
+  // @Get('profile')
+  // @Auth('admin')
+  // getUser(){
+  //   return this.UserService.getUser()
+  // }
 
   @Delete(':id')
   deleteUser(@Param('id') id: string) {
@@ -46,6 +46,11 @@ export class UserController {
   @Put(':id')
   updateAdminRole(@Param('id') id: string, @Body() admin:boolean) {
     return this.UserService.updateAdminRole(id);
+  }
+
+  @Put(':id')
+  update(@Param('id') id:string, @Body() data:UpdateUserDto){
+    return this.UserService.update(id, data)
   }
 
   @Delete()

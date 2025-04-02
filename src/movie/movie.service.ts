@@ -39,13 +39,13 @@ export class MovieService {
         genres:genreIds
        } = movie;
   
-      const actors = await this.actorsRepository.find({
+      const actors = actorIds?   await this.actorsRepository.find({
         where: actorIds.map((id) => ({ id })),
-      });
+      }) : [];
   
-      const genres = await this.genreRepository.find({
+      const genres = genreIds? await this.genreRepository.find({
         where: genreIds.map((id)=>({id}))
-      })
+      }):[];
   
       const createMovie = await this.movieRepository.create({
         name:name,
@@ -136,47 +136,30 @@ export class MovieService {
   async update(id: string, dto: CreateMovieDto): Promise<Movie | null> {
     try {
       const {
-        poster = '',
-        bigPoster = '',
-        name = '',
-        slug = '',
-        deskription = '',
-        year = 0,
-        duration = 0,
-        country = '',
-        videoUrl = '',
+        poster,
+        bigPoster,
+        name,
+        slug,
+        deskription,
+        year,
+        duration,
+        country,
+        videoUrl,
         actors: actorIds, // Массив ID актеров
         genres: genreIds, // Массив ID жанров
       } = dto;
 
       // 1. Находим фильм по ID
-      const movie = await this.movieRepository.findOne({ where: { id } });
+      const movie = await this.movieRepository.findOne({
+        where: { id },
+        relations: ['actors', 'genres'], // Load relations to correctly remove them
+      });
 
-      // if (actorIds && actorIds.length > 0) {
-      //   const uniqueActorIds = [...new Set(actorIds)]; // Удаляем дубликаты
-      
-      //   // Удаляем старые связи
-      //   const actorsToRemove = movie.actors ? movie.actors.map((actor) => actor.id) : [];
-      
-      //   await this.movieRepository
-      //   .createQueryBuilder()
-      //   .relation(Movie, 'actors')
-      //   .of(id)
-      //   .remove(actorsToRemove);
-      
-      //   // Добавляем новые связи (уже без дубликатов)
-      //   await this.movieRepository
-      //     .createQueryBuilder()
-      //     .relation(Movie, 'actors')
-      //     .of(id)
-      //     .add(uniqueActorIds);
-      // }
+      if (!movie) {
+        return null; // Или выбросить ошибку, если фильм не найден
+      }
 
-      // if (!movie) {
-      //   throw new NotFoundException(`Movie with ID ${id} not found`);
-      // }
-
-      // 2.  Формируем объект для обновления (без actors и genres)
+      // 2. Обновляем основные свойства фильма
       const updateData: Partial<Movie> = {
         name,
         slug,
@@ -189,61 +172,54 @@ export class MovieService {
         videoUrl,
       };
 
-      // 3. Удаляем свойства со значением undefined (если нужно)
-      Object.keys(updateData).forEach((key) => updateData[key] === undefined && delete updateData[key]);
+      await this.movieRepository.update(id, updateData);
 
-
-      if (actorIds && actorIds.length > 0) {
-        // Проверяем, что movie.actors существует, прежде чем вызывать map
-        const actorsToRemove = movie.actors ? movie.actors.map((actor) => actor.id) : [];
-
+      // 3. Удаляем старые связи актеров (если есть новые actorIds или нужно очистить)
+      if (actorIds !== undefined) { // Обновляем только если actorIds переданы
         await this.movieRepository
           .createQueryBuilder()
           .relation(Movie, 'actors')
           .of(id)
-          .remove(actorsToRemove);
-      } else {
-          // если actorIds не пришли, то удаляем все связи
-          // Проверяем, что movie.actors существует, прежде чем вызывать map
-          const actorsToRemove = movie.actors ? movie.actors.map((actor) => actor.id) : [];
-
-          await this.movieRepository
-          .createQueryBuilder()
-          .relation(Movie, 'actors')
-          .of(id)
-          .remove(actorsToRemove);
+          .remove(movie.actors?.map((actor) => actor.id) || []);  // remove all actors
       }
 
-      // Обновляем genres
-      if (genreIds && genreIds.length > 0) {
-        // Проверяем, что movie.genres существует, прежде чем вызывать map
-        const genresToRemove = movie.genres ? movie.genres.map((genre) => genre.id) : [];
+      // 4. Добавляем новые связи актеров (если actorIds переданы)
+      if (actorIds && actorIds.length > 0) {
+        const actors = await this.actorsRepository.findByIds(actorIds); // Find actors by ID
+        await this.movieRepository
+          .createQueryBuilder()
+          .relation(Movie, 'actors')
+          .of(id)
+          .add(actors);  // Add new actors
+      }
 
+      // 5. Обновляем жанры (аналогично актерам)
+      if (genreIds !== undefined) {  // Обновляем только если genreIds переданы
         await this.movieRepository
           .createQueryBuilder()
           .relation(Movie, 'genres')
           .of(id)
-          .remove(genresToRemove);
-      } else {
-         // если genreIds не пришли, то удаляем все связи
-          // Проверяем, что movie.genres существует, прежде чем вызывать map
-          const genresToRemove = movie.genres ? movie.genres.map((genre) => genre.id) : [];
+          .remove(movie.genres?.map((genre) => genre.id) || []);  // remove all genres
+      }
 
-          await this.movieRepository
+      if (genreIds && genreIds.length > 0) {
+        const genres = await this.genreRepository.findByIds(genreIds);
+        await this.movieRepository
           .createQueryBuilder()
           .relation(Movie, 'genres')
           .of(id)
-          .remove(genresToRemove);
+          .add(genres);
       }
 
       // 6. Возвращаем обновленную сущность
       const updatedMovie = await this.movieRepository.findOne({
         where: { id },
-        relations: ['actors', 'genres'],  // Важно: загружаем связанные сущности
-      }); // Возвращаем обновленный фильм
+        relations: ['actors', 'genres'],
+      }); // Load relations
       return updatedMovie;
     } catch (error) {
-      throw error;
+      console.error("Error updating movie:", error); // Log the error
+      throw error; // Re-throw the error
     }
   }
   async getPopularMovie () {
@@ -268,26 +244,28 @@ export class MovieService {
     }
   }
 
+  async getMoviesByGenre(genreSlug:string){
+    const movie =  this.movieRepository.find({where:{
+      
+    }})
+  }
+
   async getMovieBySlug(slug:string){
     try {
-      const movie = await this.movieRepository.find({
-        where: {
-          slug: slug,
-        },
+      const movie = await this.movieRepository.findOne({where:{slug: slug},
+      relations:['actors', 'genres']
       });
 
-      if (!movie || movie.length === 0) { // Проверка на пустой массив
-        return {
-          message: 'movie not found',
-        };
-      }
+      // if (!movie || movie.length === 0) { // Проверка на пустой массив
+      //   return {
+      //     message: 'movie not found',
+      //   };
+      // }
 
-      return {
-        message: 'movie found',
-        movie,
-      };
+      return movie
+;
     } catch (error) {
-      console.error("Error fetching movie:", error); // Логируйте ошибку
+      console.error("Error fetching movie:", error); 
       return {
         status: false,
       };

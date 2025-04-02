@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { CreateGenreDto } from './dto/create-genre.dto';
@@ -26,9 +27,9 @@ export class GenreController {
   }
 
   @Get()
-  getAllGenre() {
+  getAllGenre(@Query('searchTerm') searchTerm?: string) {
     return this.GenreService
-    .getAllGenres();
+    .getAllGenres(searchTerm);
   }
 
 
@@ -46,5 +47,10 @@ export class GenreController {
   @Delete('/:id')
   deleteGenreById(@Param('id') id:string){
     return this.GenreService.deleteGenreById(id)
+  }
+
+  @Delete()
+  deleteAllGenres(){
+    return this.GenreService.deleteAllGenres()
   }
 }
