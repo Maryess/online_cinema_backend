@@ -12,27 +12,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt'){
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
     ) {
-        super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false,
-            secretOrKey: configService.get<string>('JWT_SECRET'),
-        });
-    }
+		super({
+			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+			ignoreExpiration: true,
+			secretOrKey: configService.get('JWT_SECRET'),
+		})
+	}
 
-    async validate({id}:Pick<User,'id'>){
-        try{
-            const user = await this.userRepository.findOneBy({ id:id });
-            console.log('JwtStrategy.validate - User:', user); // Log the user
-
-            if (!user) {
-                console.log('JwtStrategy.validate - User not found!'); // Log if user not found
-                throw new UnauthorizedException();
-            }
-
-            return user;
-        }catch(error){
-            console.error('JwtStrategy.validate - Error:', error); // Log any errors
-            throw new UnauthorizedException();
-        }
-    }
+	async validate({ id }: Pick<User, 'id'>) {
+		const user = await this.userRepository.findOne({where:{id:id}})
+		return user
+	}
 }

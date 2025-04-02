@@ -1,10 +1,15 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsArray, IsNumber, IsString } from "class-validator";
+import { Movie } from "src/movie/entity/movie.entity";
 
 export class UpdateActorDto {
-   @IsString()
-    firstName: string;
     @IsString()
-    lastName:string;
+    name:string;
+    @IsString()
+    slug:string;
     @IsNumber()
     year:number;
+    @IsNumber()
+    country:string;
+    @IsString()
+    photo:string;
 }

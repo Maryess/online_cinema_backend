@@ -1,4 +1,4 @@
-import { IsArray, IsNumber, IsObject, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsString } from 'class-validator';
 
 
 export class CreateMovieDto {
@@ -40,5 +40,5 @@ export class CreateMovieDto {
 
   @IsArray()
   @IsString({each:true})
-  favorites:string[];
+  favorites?:string[];
 }

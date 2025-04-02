@@ -2,13 +2,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Genre } from './entity/genre.entity';
 import { CreateGenreDto } from './dto/create-genre.dto';
+import { UpdateGenreDto } from './dto/update-genre.dto';
 import { Movie } from 'src/movie/entity/movie.entity';
 
 
 export class GenreService {
   constructor(
     @InjectRepository(Genre)
-    private readonly genreRepository: Repository<Genre>
+    private readonly genreRepository: Repository<Genre>,
+    @InjectRepository(Movie)
+    private readonly movieRepository: Repository<Movie>
   ) {}
 
   async createGenre(Genre: CreateGenreDto) {
@@ -36,33 +39,90 @@ export class GenreService {
   
   }
 
-  async getAllGenres() {
+  async genGenreById(genreId:string){
     try{
-      const genres = await this.genreRepository.find()
+      const genre = await this.genreRepository.find({where:{
+        id:genreId
+      }})
 
-      if(!genres){
-        return false
-      }
-
-      return genres
-    }catch{
+      return genre
+    }catch(error){
       return {
-        status:false
+        error: error
+      }
+    }
+  }
+
+  async getAllGenres(searchTerm?:string) {
+    const queryBuilder = this.genreRepository
+      .createQueryBuilder('genre')
+      .where('genre.deleted_at IS NULL');
+
+    if (searchTerm) {
+      queryBuilder.andWhere(
+        "to_tsvector('english', genre.name || ' ' || genre.slug ) @@ plainto_tsquery('english', :searchTerm)",
+        { searchTerm },
+      );
+    }
+
+    try {
+      const genres = await queryBuilder.getMany();
+      return genres;
+    } catch (error) {
+      console.error('Error fetching genres:', error);
+      throw error;
+    }
+  }
+
+  async updateGenre(genreId:string, data:UpdateGenreDto){
+    try{
+      const genre = await this.genreRepository.find({where:{
+        id:genreId
+      }})
+
+     const newGenre =  await this.genreRepository.update(genreId, {...data})
+      return newGenre
+    }catch(error){
+      return {
+        error: error
       }
     }
   }
 
   async deleteGenreById(genreID:string){
     try {
-      const genre = await this.genreRepository.findOne({where:{id:genreID}})
+      const genre =await this.genreRepository.findOneBy({id:genreID});
       if(!genre){
         return false
       }
-
+      // await this.movieRepository.delete({genres: genre});
       await this.genreRepository.remove(genre)
       return true
-    }catch{
-      return false
+    }catch(error){
+      return error
     }
+  }
+
+  async deleteAllGenres(){
+    try{
+
+      const genres = await this.genreRepository.find()
+
+      for(const genre of genres){
+        await this.genreRepository
+        .createQueryBuilder()
+        .relation(Genre, 'movies') 
+        .of(genres)
+        .remove(genre.movies);
+      }
+         await this.genreRepository.remove(genres)
+         return{
+          message:'Genres deleted'
+         }
+        }catch(error){
+          return{
+            message:error
+          }
+        }
   }
 }

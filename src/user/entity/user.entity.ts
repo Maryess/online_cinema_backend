@@ -5,19 +5,12 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMa
 export class User {
   @PrimaryGeneratedColumn("uuid")
   id: string;
-
-  @Column()
-  name: string;
   @Column()
   email: string;
   @Column()
   password: string;
-  @Column()
-  access_token: string;
-  @Column()
-  refresh_token:string;
-  @Column()
-  isAdmin:boolean;
+  @Column({default:false})
+  isAdmin?:boolean;
   @ManyToMany(()=>Movie,(movie)=>movie.users)
   @JoinTable({
     name: 'users_favorite_movies', 
@@ -30,7 +23,7 @@ export class User {
       referencedColumnName: 'id',
     },
     })
-    favorites: Movie[];
+    favorites?: Movie[];
   
 
   @CreateDateColumn()

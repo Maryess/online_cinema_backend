@@ -3,7 +3,6 @@ import { Repository } from 'typeorm';
 import { UpdateActorDto } from './dto/update-actor.dto';
 import { Actor } from './entity/actor.entity';
 import { CreateActorDto } from './dto/create-actor.dto';
-import { Movie } from 'src/movie/entity/movie.entity';
 
 export class ActorService {
   constructor(
@@ -13,7 +12,7 @@ export class ActorService {
 
   async createActor(actor: CreateActorDto) {
     try{
-      const {name,slug,year,country,photo} = actor
+      const {name ='',slug='',year=0,country='',photo=''} = actor
 
     const createActor = await this.actorRepository.create({
       name:name,
@@ -23,9 +22,6 @@ export class ActorService {
       photo:photo
     });
 
-    if (createActor) {
-      return false
-    } 
     return await this.actorRepository.save(createActor);
     }catch{
       return {
@@ -50,7 +46,7 @@ export class ActorService {
           await this.actorRepository.remove(actor);
           return true;
         } catch (error) {
-          console.error("Ошибка при удалении фильма:", error);
+          console.error("Ошибка при удалении актера:", error);
           return false;
         }
   }
@@ -65,14 +61,17 @@ export class ActorService {
     }
   }
 
-  async updateActor(_id: string, actor: UpdateActorDto) {
-    const updateActor = this.actorRepository.update(_id,{...actor});
+  async updateActor(actorId: string, data: UpdateActorDto) {
+    try{
+      const updateActor = this.actorRepository.update(actorId,{...data});
 
-    if (updateActor) {
-      return { message: 'Actor updated', id: `${_id}` };
-    } else {
-      return 'Please,check validate on your fields';
+     return updateActor
+    }catch(error){
+      return {
+        error: error
+      }
     }
+    
   }
 
   async getAllActor() {

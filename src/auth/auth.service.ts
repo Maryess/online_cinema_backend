@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcryptjs'; 
 import { ConfigService } from '@nestjs/config';
 import { AuthDto } from './dto/auth.dto';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
@@ -18,23 +18,18 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
+  async findByEmail (email:string) {
+    return this.userRepository.findOneBy({email:email})
+  }
+
   async register(data: AuthDto) {
     try{
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(data.password, salt);
     
-    const oldUser = await this.userRepository.findOneBy({email:data.email})
-    if(oldUser){
-      throw new BadRequestException('User with this email is already in the system ')
-    }
-
     const createUser = this.userRepository.create({
       password: hashPassword,
-      email:data.email,
-      name:'',
-      access_token:'',
-      refresh_token:'',
-      isAdmin:false
+      email:data.email
     });
   
     await this.userRepository.save(createUser); 
@@ -97,7 +92,7 @@ export class AuthService {
     try{
     const data = {id:userId}
 
-    const refreshTOken = await this.jwtService.signAsync(data,{
+    const refreshToken = await this.jwtService.signAsync(data,{
       expiresIn:'15d'
     })
 
@@ -105,7 +100,7 @@ export class AuthService {
       expiresIn:'15h'
     })
 
-    return{refreshTOken,accessToken}
+    return{refreshToken,accessToken}
   }catch(error){
     return{message:error}
   }

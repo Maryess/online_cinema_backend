@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entity/user.entity';
-import { Repository } from 'typeorm';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Movie } from 'src/movie/entity/movie.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -15,21 +16,6 @@ export class UserService {
     private readonly movieRepository: Repository<Movie> 
   ) {}
 
-  async createUser(user: CreateUserDto) {
-    const { name, email, password, favorites:favoritesIds } = user;
-
-    const favorites = await this.movieRepository.find({
-      where: favoritesIds.map((id) => ({ id })),
-    });
-
-    const createUser = this.userRepository.create({ name, email, password,favorites});
-
-    if (createUser) {
-      return this.userRepository.save(createUser);
-    }
-
-   
-  }
   
   async getAllUser() {
     return this.userRepository.find({relations:{
@@ -37,12 +23,18 @@ export class UserService {
     }});
   }
 
-  async getUser(){
-    return {email:'fsgd'}
+  async getUserById(id:string){
+    return await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    
   }
 
   async removeUser(id: string) {
-    const user = this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: {
         id: id,
       },
@@ -62,7 +54,7 @@ export class UserService {
   }
 
   async addMovieToFavorites(userId: string, movieId: string){
-    const user = await this.userRepository.findOneBy({id: userId});
+    try{const user = await this.userRepository.findOneBy({id: userId});
     const movie = await this.movieRepository.findOneBy({id: movieId});
     if(!movie) {
       throw new Error('Movie not found')
@@ -72,19 +64,64 @@ export class UserService {
     }
     user.favorites.push(movie);
     
-    return await this.userRepository.save(user);
+    return await this.userRepository.save(user);}
+    catch(error){
+      return {
+        message:'User dont updated'
+      }
+    }
+  }
+
+  async getAllFavoritesMovies(userId:string){
+    try{
+      const user = await this.userRepository.findOne({where:{id:userId},
+      relations:{
+        favorites:true
+      }})
+      return {
+        movies: user.favorites
+      }
+    }catch(error){
+      return{
+        message:'Error',
+        error: error
+      }
+    }
   }
 
   async deleteAllUsers(){
+  try{
+    await this.userRepository.createQueryBuilder().delete().from(User).execute()
+    return{
+    message:'Users deleted'
+    }
+  }catch(error){
+    return{
+      message:error
+    }
+  }
+  }
+
+  async updateAdminRole(id:string){
     try{
-     await this.userRepository.createQueryBuilder().delete().from(User).execute()
-     return{
-      message:'Users deleted'
-     }
+     
+      return await this.userRepository.update(id,{isAdmin:true})
+
+      
     }catch(error){
-      return{
+      return {
         message:error
       }
+    }
+  }
+
+  async update(userId:string, data:UpdateUserDto){
+    try{
+      const user = await this.userRepository.findOneBy({id:userId})
+
+      return await this.userRepository.update(userId, {...data})
+    }catch(error){
+      return error
     }
   }
 }
