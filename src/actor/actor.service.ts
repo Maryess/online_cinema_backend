@@ -89,6 +89,25 @@ export class ActorService {
     
   }
 
+  async getActorBySlug(slug:string){
+    try {
+      const actor = await this.actorRepository.findOne({where:{slug: slug},
+      relations:['movies']
+      });
+
+      // if (!movie || movie.length === 0) { // Проверка на пустой массив
+      //   return {
+      //     message: 'movie not found',
+      //   };
+      // }
+
+      return actor
+    } catch (error) {
+      console.error("Error fetching movie:", error); 
+      return error
+    }
+  }
+
   async getActorId(_id: string) {
     try{
       return await this.actorRepository.findOne({ where: { id: _id } });
