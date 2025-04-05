@@ -27,6 +27,11 @@ export class ActorController {
     return this.ActorService.getActorId(_id);
   }
 
+  @Get(':slug')
+  async getActorBySlug(@Param('slug') slug:string){
+    return this.ActorService.getActorBySlug(slug)
+  }
+
   @Post()
   createActor(@Body() actor: CreateActorDto) {
     return this.ActorService.createActor(actor);

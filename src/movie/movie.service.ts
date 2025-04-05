@@ -263,7 +263,6 @@ export class MovieService {
       // }
 
       return movie
-;
     } catch (error) {
       console.error("Error fetching movie:", error); 
       return {
