@@ -95,15 +95,9 @@ export class ActorService {
       relations:['movies']
       });
 
-      // if (!movie || movie.length === 0) { // Проверка на пустой массив
-      //   return {
-      //     message: 'movie not found',
-      //   };
-      // }
-
       return actor
     } catch (error) {
-      console.error("Error fetching movie:", error); 
+      console.error("Error fetching actor:", error); 
       return error
     }
   }
@@ -118,4 +112,12 @@ export class ActorService {
     }
   
   }
+
+  // async getMovies(){
+  //   try{
+  //     return await this.actorRepository.find
+  //   }catch{
+
+  //   }
+  // }
 }

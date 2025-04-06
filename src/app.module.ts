@@ -15,6 +15,8 @@ import { Genre } from './genre/entity/genre.entity';
 import { RatingModule } from './rating/rating.module';
 import { Rating } from './rating/entity/rating.entity';
 import { ConfigModule } from '@nestjs/config';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { MetricsController } from './metric.controller';
 
 @Module({
   imports: [
@@ -23,15 +25,22 @@ import { ConfigModule } from '@nestjs/config';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT) || 5432,
+      username: process.env.DB_USERNAME || 'postgres',
+      password: process.env.DB_PASSWORD || '6666',
+      database: process.env.DB_NAME || 'cinema',
       synchronize: false, 
       logging: true,
       entities: [User, Actor, Movie, Genre, Rating],
     }),
+    PrometheusModule.register({
+      path: '/metrics',
+      defaultMetrics:{
+        enabled:true
+      }
+    }),
+
     UserModule,
     ActorModule,
     MovieModule,
@@ -41,7 +50,7 @@ import { ConfigModule } from '@nestjs/config';
     RatingModule
   ],
 
-  controllers: [AppController],
+  controllers: [AppController, MetricsController],
   providers: [AppService],
 })
 export class AppModule {}

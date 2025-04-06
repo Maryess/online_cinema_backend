@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { RelationId, Repository } from 'typeorm';
 import { Genre } from './entity/genre.entity';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
@@ -56,6 +56,7 @@ export class GenreService {
   async getAllGenres(searchTerm?:string) {
     const queryBuilder = this.genreRepository
       .createQueryBuilder('genre')
+      .leftJoinAndSelect('genre.movies', 'movies')
       .where('genre.deleted_at IS NULL');
 
     if (searchTerm) {

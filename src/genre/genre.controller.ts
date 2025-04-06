@@ -28,10 +28,8 @@ export class GenreController {
 
   @Get()
   getAllGenre(@Query('searchTerm') searchTerm?: string) {
-    return this.GenreService
-    .getAllGenres(searchTerm);
+    return this.GenreService.getAllGenres(searchTerm);
   }
-
 
   @Post()
   createGenre(@Body() genre: CreateGenreDto) {

@@ -22,14 +22,9 @@ export class ActorController {
     return this.ActorService.getAllActor();
   }
 
-  @Get(':id')
-  getActorId(@Param('id') _id: string) {
-    return this.ActorService.getActorId(_id);
-  }
-
   @Get(':slug')
-  async getActorBySlug(@Param('slug') slug:string){
-    return this.ActorService.getActorBySlug(slug)
+  async getActorBySLug(@Param('slug') slug:string){
+    return await this.ActorService.getActorBySlug(slug)
   }
 
   @Post()
