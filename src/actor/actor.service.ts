@@ -74,17 +74,25 @@ export class ActorService {
     
   }
 
-  async getAllActor() {
+  async getAllActor(searchTerm?:string) {
+
+    const queryBuilder = this.actorRepository
+    .createQueryBuilder('actor')
+    .leftJoinAndSelect('actor.movies','movie')
+    .where('actor.deleted_at IS NULL')
+
+    if(searchTerm){
+      queryBuilder.andWhere(
+        "to_tsvector('english', actor.name || ' ' || actor.slug) @@ plainto_tsquery('english', :searchTerm)",
+        {searchTerm}
+      )
+    }
+
     try{
-      return this.actorRepository.find({
-        relations:{
-          movies:true
-        }
-      });
-    }catch{
-      return {
-        status:false
-      }
+      const actors = queryBuilder.getMany()
+      return actors
+    }catch(error){
+      return error
     }
     
   }

@@ -53,6 +53,19 @@ export class GenreService {
     }
   }
 
+  async getGenreBySlug(slug:string){
+    try {
+      const genre = await this.genreRepository.findOne({where:{slug: slug},
+      relations:['movies']
+      });
+
+      return genre
+    } catch (error) {
+      console.error("Error fetching actor:", error); 
+      return error
+    }
+  }
+
   async getAllGenres(searchTerm?:string) {
     const queryBuilder = this.genreRepository
       .createQueryBuilder('genre')

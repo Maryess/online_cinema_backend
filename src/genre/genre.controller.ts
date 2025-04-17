@@ -21,9 +21,14 @@ export class GenreController {
 
   ) {}
 
-  @Get('/:id')
-  getGenreById(@Param('id') id:string){
-    return this.GenreService.genGenreById(id)
+  // @Get('/by-id/:id')
+  // getGenreById(@Param('id') id:string){
+  //   return this.GenreService.genGenreById(id)
+  // }
+
+  @Get('/:slug')
+  async getGenreBySlug(@Param('slug') slug:string){
+    return await this.GenreService.getGenreBySlug(slug)
   }
 
   @Get()

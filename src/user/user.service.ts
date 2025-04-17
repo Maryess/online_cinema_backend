@@ -17,7 +17,7 @@ export class UserService {
   ) {}
 
   
-  async getAllUser() {
+  async getAllUser(searchTerm?:string) {
     return this.userRepository.find({relations:{
       favorites:true
     }});
