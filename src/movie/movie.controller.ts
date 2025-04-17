@@ -4,9 +4,9 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { MovieService } from './movie.service';
@@ -17,8 +17,8 @@ export class MovieController {
   constructor(private readonly MovieService: MovieService) {}
 
   @Get()
-  async getAllMovie() {
-    return await this.MovieService.getAllMovies();
+  async getAllMovie(@Query('searchTerm') searchTerm?: string) {
+    return await this.MovieService.getAllMovies(searchTerm);
   }
 
   @Get('popular-movie')
@@ -47,6 +47,11 @@ export class MovieController {
   updateMovie(@Param('movieId') movieId:string, @Body() data:CreateMovieDto){
     return this.MovieService.update(movieId,data)
   }
+
+  // @Put('/:movieId/count')
+  // updateCount(@Param('movieId') movieId:string){
+  //   return this.MovieService.updateCount(movieId)
+  // }
 
   @Delete('/:id')
   async deleteMovie(@Param('id') _id: string) {

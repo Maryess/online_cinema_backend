@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ActorService } from './actor.service';
 import { CreateActorDto } from './dto/create-actor.dto';
@@ -18,18 +19,13 @@ export class ActorController {
   constructor(private readonly ActorService: ActorService) {}
 
   @Get()
-  getAllActor() {
-    return this.ActorService.getAllActor();
-  }
-
-  @Get(':id')
-  getActorId(@Param('id') _id: string) {
-    return this.ActorService.getActorId(_id);
+  getAllActor(@Query('searchTerm') searchTerm?:string) {
+    return this.ActorService.getAllActor(searchTerm);
   }
 
   @Get(':slug')
-  async getActorBySlug(@Param('slug') slug:string){
-    return this.ActorService.getActorBySlug(slug)
+  async getActorBySLug(@Param('slug') slug:string){
+    return await this.ActorService.getActorBySlug(slug)
   }
 
   @Post()

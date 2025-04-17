@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { RelationId, Repository } from 'typeorm';
 import { Genre } from './entity/genre.entity';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
@@ -53,9 +53,23 @@ export class GenreService {
     }
   }
 
+  async getGenreBySlug(slug:string){
+    try {
+      const genre = await this.genreRepository.findOne({where:{slug: slug},
+      relations:['movies']
+      });
+
+      return genre
+    } catch (error) {
+      console.error("Error fetching actor:", error); 
+      return error
+    }
+  }
+
   async getAllGenres(searchTerm?:string) {
     const queryBuilder = this.genreRepository
       .createQueryBuilder('genre')
+      .leftJoinAndSelect('genre.movies', 'movies')
       .where('genre.deleted_at IS NULL');
 
     if (searchTerm) {

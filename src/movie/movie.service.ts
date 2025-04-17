@@ -118,17 +118,26 @@ export class MovieService {
     movie.rating = rating
   }
 
-  async getAllMovies() {
+  async getAllMovies(searchTerm?:string) {
+
+    const queryBuilder = this.movieRepository
+    .createQueryBuilder('movie')
+    .leftJoinAndSelect('movie.actors', 'actors')
+    .leftJoinAndSelect('movie.genres', 'genres')
+    .where('movie.deleted_at IS NULL')
+
+    if(searchTerm){
+      queryBuilder.andWhere(
+        "to_tsvector('english', movie.name || ' ' || movie.slug) @@ plainto_tsquery('english', :searchTerm)",
+        {searchTerm}
+      )
+    }
+
     try{ 
-      return this.movieRepository.find({relations:{
-        actors:true,
-        genres:true,
-        rating:true
-      }});
-    }catch{
-      return {
-        status:false
-      }
+      const movies = queryBuilder.getMany();
+      return movies
+    }catch(error){
+      return error
     }
    
   }
@@ -145,21 +154,19 @@ export class MovieService {
         duration,
         country,
         videoUrl,
-        actors: actorIds, // Массив ID актеров
-        genres: genreIds, // Массив ID жанров
+        actors: actorIds, 
+        genres: genreIds,
       } = dto;
 
-      // 1. Находим фильм по ID
       const movie = await this.movieRepository.findOne({
         where: { id },
-        relations: ['actors', 'genres'], // Load relations to correctly remove them
+        relations: ['actors', 'genres'], 
       });
 
       if (!movie) {
-        return null; // Или выбросить ошибку, если фильм не найден
+        return null; 
       }
 
-      // 2. Обновляем основные свойства фильма
       const updateData: Partial<Movie> = {
         name,
         slug,
@@ -174,32 +181,29 @@ export class MovieService {
 
       await this.movieRepository.update(id, updateData);
 
-      // 3. Удаляем старые связи актеров (если есть новые actorIds или нужно очистить)
-      if (actorIds !== undefined) { // Обновляем только если actorIds переданы
+      if (actorIds !== undefined) { 
         await this.movieRepository
           .createQueryBuilder()
           .relation(Movie, 'actors')
           .of(id)
-          .remove(movie.actors?.map((actor) => actor.id) || []);  // remove all actors
+          .remove(movie.actors?.map((actor) => actor.id) || []); 
       }
 
-      // 4. Добавляем новые связи актеров (если actorIds переданы)
       if (actorIds && actorIds.length > 0) {
-        const actors = await this.actorsRepository.findByIds(actorIds); // Find actors by ID
+        const actors = await this.actorsRepository.findByIds(actorIds); 
         await this.movieRepository
           .createQueryBuilder()
           .relation(Movie, 'actors')
           .of(id)
-          .add(actors);  // Add new actors
+          .add(actors); 
       }
 
-      // 5. Обновляем жанры (аналогично актерам)
-      if (genreIds !== undefined) {  // Обновляем только если genreIds переданы
+      if (genreIds !== undefined) { 
         await this.movieRepository
           .createQueryBuilder()
           .relation(Movie, 'genres')
           .of(id)
-          .remove(movie.genres?.map((genre) => genre.id) || []);  // remove all genres
+          .remove(movie.genres?.map((genre) => genre.id) || []);  
       }
 
       if (genreIds && genreIds.length > 0) {
@@ -211,17 +215,37 @@ export class MovieService {
           .add(genres);
       }
 
-      // 6. Возвращаем обновленную сущность
       const updatedMovie = await this.movieRepository.findOne({
         where: { id },
         relations: ['actors', 'genres'],
-      }); // Load relations
+      }); 
       return updatedMovie;
     } catch (error) {
-      console.error("Error updating movie:", error); // Log the error
-      throw error; // Re-throw the error
+      console.error("Error updating movie:", error); 
+      throw error; 
     }
   }
+
+  // async updateCount(movieId:string){
+  //   try{
+  //     const movie = await this.movieRepository.findOne({where:{id:movieId}})
+
+  //     const updateData = {
+  //       countOpened: movie.countOpened + 1
+  //     }
+
+  //     const updateMovie = await this.movieRepository.update(movieId, updateData)
+
+  //     return updateMovie
+  //   }catch (error) {
+  //     console.error("Error fetching movie:", error); 
+  //     return {
+  //       status: false,
+  //     };
+  //   }
+  // }
+
+
   async getPopularMovie () {
     try{
 
@@ -256,11 +280,11 @@ export class MovieService {
       relations:['actors', 'genres']
       });
 
-      // if (!movie || movie.length === 0) { // Проверка на пустой массив
-      //   return {
-      //     message: 'movie not found',
-      //   };
-      // }
+      const updateData = {
+        countOpened: movie.countOpened + 1
+      }
+
+      await this.movieRepository.update(movie.id, updateData)
 
       return movie
     } catch (error) {

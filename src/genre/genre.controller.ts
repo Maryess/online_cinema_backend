@@ -21,17 +21,20 @@ export class GenreController {
 
   ) {}
 
-  @Get('/:id')
-  getGenreById(@Param('id') id:string){
-    return this.GenreService.genGenreById(id)
+  // @Get('/by-id/:id')
+  // getGenreById(@Param('id') id:string){
+  //   return this.GenreService.genGenreById(id)
+  // }
+
+  @Get('/:slug')
+  async getGenreBySlug(@Param('slug') slug:string){
+    return await this.GenreService.getGenreBySlug(slug)
   }
 
   @Get()
   getAllGenre(@Query('searchTerm') searchTerm?: string) {
-    return this.GenreService
-    .getAllGenres(searchTerm);
+    return this.GenreService.getAllGenres(searchTerm);
   }
-
 
   @Post()
   createGenre(@Body() genre: CreateGenreDto) {

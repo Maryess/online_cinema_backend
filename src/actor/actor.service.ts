@@ -74,17 +74,25 @@ export class ActorService {
     
   }
 
-  async getAllActor() {
+  async getAllActor(searchTerm?:string) {
+
+    const queryBuilder = this.actorRepository
+    .createQueryBuilder('actor')
+    .leftJoinAndSelect('actor.movies','movie')
+    .where('actor.deleted_at IS NULL')
+
+    if(searchTerm){
+      queryBuilder.andWhere(
+        "to_tsvector('english', actor.name || ' ' || actor.slug) @@ plainto_tsquery('english', :searchTerm)",
+        {searchTerm}
+      )
+    }
+
     try{
-      return this.actorRepository.find({
-        relations:{
-          movies:true
-        }
-      });
-    }catch{
-      return {
-        status:false
-      }
+      const actors = queryBuilder.getMany()
+      return actors
+    }catch(error){
+      return error
     }
     
   }
@@ -95,15 +103,9 @@ export class ActorService {
       relations:['movies']
       });
 
-      // if (!movie || movie.length === 0) { // Проверка на пустой массив
-      //   return {
-      //     message: 'movie not found',
-      //   };
-      // }
-
       return actor
     } catch (error) {
-      console.error("Error fetching movie:", error); 
+      console.error("Error fetching actor:", error); 
       return error
     }
   }
@@ -118,4 +120,12 @@ export class ActorService {
     }
   
   }
+
+  // async getMovies(){
+  //   try{
+  //     return await this.actorRepository.find
+  //   }catch{
+
+  //   }
+  // }
 }
