@@ -90,7 +90,10 @@ export class ActorService {
 
     try{
       const actors = queryBuilder.getMany()
-      return actors
+
+      const newActors = (await actors).sort((a,b)=>a.name.localeCompare(b.name))
+
+      return newActors
     }catch(error){
       return error
     }

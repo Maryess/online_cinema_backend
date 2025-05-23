@@ -23,7 +23,7 @@ export class UserService {
     }});
   }
 
-  async getUserById(id:string){
+  async getUserById(id:string | undefined){
     return await this.userRepository.findOne({
       where: {
         id: id,
@@ -53,8 +53,8 @@ export class UserService {
     }
   }
 
-  async addMovieToFavorites(userId: string, movieId: string){
-    try{const user = await this.userRepository.findOneBy({id: userId});
+  async addMovieToFavorites(email: string, movieId: string){
+    try{const user = await this.userRepository.findOneBy({email: email});
     const movie = await this.movieRepository.findOneBy({id: movieId});
     if(!movie) {
       throw new Error('Movie not found')
@@ -72,15 +72,14 @@ export class UserService {
     }
   }
 
-  async getAllFavoritesMovies(userId:string){
+  async getAllFavoritesMovies(email:string){
     try{
-      const user = await this.userRepository.findOne({where:{id:userId},
+      const user = await this.userRepository.findOne({where:{email:email},
       relations:{
         favorites:true
       }})
-      return {
-        movies: user.favorites
-      }
+      return user.favorites
+      
     }catch(error){
       return{
         message:'Error',

@@ -22,13 +22,7 @@ export class UserController {
     return this.UserService.getAllUser();
   }
 
-  // @Get('profile')
-  // @Auth('admin')
-  // getUser(){
-  //   return this.UserService.getUser()
-  // }
-
-  @Delete(':id')
+   @Delete(':id')
   deleteUser(@Param('id') id: string) {
     return this.UserService.removeUser(id);
   }
@@ -58,9 +52,9 @@ export class UserController {
     return this.UserService.deleteAllUsers()
   }
 
-  @Put(':userId/favorites/:movieId')
-  updateUser(@Param('userId') userId: string,
-   @Param('movieId') movieId:string) {
-    return this.UserService.addMovieToFavorites(userId,movieId);
+  @Put(':email/:movieId')
+  updateUser(@Param('email/movieId') email: string,movieId:string
+   ) {
+    return this.UserService.addMovieToFavorites(email,movieId);
   }
 }
