@@ -81,7 +81,10 @@ export class GenreService {
 
     try {
       const genres = await queryBuilder.getMany();
-      return genres;
+
+      const newGenres = genres.sort((a,b)=>a.name.localeCompare(b.name))
+
+      return newGenres;
     } catch (error) {
       console.error('Error fetching genres:', error);
       throw error;

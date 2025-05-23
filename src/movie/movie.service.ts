@@ -135,11 +135,34 @@ export class MovieService {
 
     try{ 
       const movies = queryBuilder.getMany();
-      return movies
+
+      const newMovies = (await movies).sort((a,b)=>a.name.localeCompare(b.name))
+
+      return newMovies
     }catch(error){
       return error
     }
    
+  }
+
+  async getPopularMovie(){
+
+    const queryBuilder = this.movieRepository
+      .createQueryBuilder('movie')
+      .leftJoinAndSelect('movie.actors', 'actors')
+      .leftJoinAndSelect('movie.genres', 'genres')
+    .where('movie.deleted_at IS NULL')
+
+    try{
+  
+      const movies = queryBuilder.getMany()
+       
+      const popularMovies = (await movies).sort((a,b)=> b.countOpened - a.countOpened)
+
+      return popularMovies
+    }catch(error){
+      return error
+    }
   }
 
   async update(id: string, dto: CreateMovieDto): Promise<Movie | null> {
@@ -224,54 +247,6 @@ export class MovieService {
       console.error("Error updating movie:", error); 
       throw error; 
     }
-  }
-
-  // async updateCount(movieId:string){
-  //   try{
-  //     const movie = await this.movieRepository.findOne({where:{id:movieId}})
-
-  //     const updateData = {
-  //       countOpened: movie.countOpened + 1
-  //     }
-
-  //     const updateMovie = await this.movieRepository.update(movieId, updateData)
-
-  //     return updateMovie
-  //   }catch (error) {
-  //     console.error("Error fetching movie:", error); 
-  //     return {
-  //       status: false,
-  //     };
-  //   }
-  // }
-
-
-  async getPopularMovie () {
-    try{
-
-      let message = ''
-      const findAll = await this.movieRepository.find()
-
-      findAll.map((movie)=>{
-       movie.countOpened === 0 ? message= 'not found': message ='found'
-
-      })
-
-      return{
-        message
-      }
-
-    }catch{
-      return{
-        status:false
-      }
-    }
-  }
-
-  async getMoviesByGenre(genreSlug:string){
-    const movie =  this.movieRepository.find({where:{
-      
-    }})
   }
 
   async getMovieBySlug(slug:string){
