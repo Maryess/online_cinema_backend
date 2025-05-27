@@ -13,7 +13,7 @@ async function bootstrap() {
   let cors = require('cors');
 
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
-
+  app.use('/translated', express.static(join(__dirname, '..', 'translated')));
   app.use(cors());
 
   app.enableCors({

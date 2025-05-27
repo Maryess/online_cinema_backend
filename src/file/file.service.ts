@@ -28,6 +28,25 @@ export class FileService {
       throw new Error('Whisper transcription failed');
     }
   }
+  async translateVttFile(
+    inputVttPath: string,
+    outputVttPath: string,
+    targetLang: string,
+    sourceLang = 'en',
+  ) {
+    const sourceArg = sourceLang ? `"${sourceLang}"` : '';
+    try {
+      const { stdout, stderr } = await this.execAsync(
+        `/Users/user/whisper-env/bin/python3 scripts/translate_vtt.py "${inputVttPath}" "${outputVttPath}" "${targetLang}" "${sourceLang}"`,
+      );
+
+      if (stderr) console.error('Translation stderr:', stderr);
+      else console.log('Translation stdout:', stdout);
+    } catch (err) {
+      console.error('Translation error:', err);
+      throw new Error('VTT translation failed');
+    }
+  }
 
   async saveFiles(
     files: Express.Multer.File[],

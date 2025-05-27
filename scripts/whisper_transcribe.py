@@ -7,7 +7,7 @@ def format_time(seconds):
     secs = int(seconds % 60)
     milliseconds = int((seconds % 1) * 1000)
     return f"{hours:02}:{minutes:02}:{secs:02}.{milliseconds:03}"
-
+    
 if len(sys.argv) != 3:
     print("Usage: whisper_transcribe.py input_audio_path output_vtt_path")
     sys.exit(1)
@@ -25,3 +25,6 @@ with open(output_path, "w", encoding="utf-8") as f:
         end = format_time(segment["end"])
         text = segment["text"].strip()
         f.write(f"{i+1}\n{start} --> {end}\n{text}\n\n")
+        
+
+
