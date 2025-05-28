@@ -1,13 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { FileResponse } from './file.interface';
 import { path } from 'app-root-path';
-import { ensureDir, writeFile, readFile } from 'fs-extra';
+import { ensureDir, writeFile, pathExists, remove, readdir } from 'fs-extra';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { unlink } from 'fs';
 
 @Injectable()
 export class FileService {
+  private readonly translatedFolder = `${path}/translated`;
   execAsync = promisify(exec);
+
+  async checkTranslation(fileName: string): Promise<boolean> {
+    const translatedFilePath = `${this.translatedFolder}/${fileName}`;
+
+    return await pathExists(translatedFilePath);
+  }
 
   async transcribeAudioToVtt(
     mp3Path: string,
@@ -34,6 +42,15 @@ export class FileService {
     targetLang: string,
     sourceLang = 'en',
   ) {
+    const translationExists = await pathExists(outputVttPath);
+    if (translationExists) {
+      const translatedName =
+        outputVttPath.split('/').pop() || 'translated file';
+      throw new ConflictException(
+        `Translation for language "${targetLang}" already exists for file "${translatedName}"`,
+      );
+    }
+
     const sourceArg = sourceLang ? `"${sourceLang}"` : '';
     try {
       const { stdout, stderr } = await this.execAsync(
@@ -45,6 +62,26 @@ export class FileService {
     } catch (err) {
       console.error('Translation error:', err);
       throw new Error('VTT translation failed');
+    }
+  }
+
+  async removeVttFile(outputVttPath: string) {
+    const exists = await pathExists(outputVttPath);
+    if (!exists) {
+      throw new Error('VTT file not found');
+    }
+
+    await remove(outputVttPath);
+    console.log(`${outputVttPath} was deleted`);
+  }
+
+  async getAllVtt(target: string) {
+    try {
+      const files = await readdir(this.translatedFolder);
+      return files.filter((file) => file.startsWith(`${target}`));
+    } catch (error) {
+      console.error('Failed to read translated folder:', error);
+      throw new Error('Could not get list of translated VTT files');
     }
   }
 

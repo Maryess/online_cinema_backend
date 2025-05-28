@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActorModule } from './actor/actor.module';
 import { Actor } from './actor/entity/actor.entity';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { Movie } from './movie/entity/movie.entity';
 import { MovieModule } from './movie/movie.module';
@@ -21,7 +19,7 @@ import { MetricsController } from './metric.controller';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Make ConfigModule available globally
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -30,15 +28,15 @@ import { MetricsController } from './metric.controller';
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || '6666',
       database: process.env.DB_NAME || 'cinema',
-      synchronize: false, 
+      synchronize: false,
       logging: true,
       entities: [User, Actor, Movie, Genre, Rating],
     }),
     PrometheusModule.register({
       path: '/metrics',
-      defaultMetrics:{
-        enabled:true
-      }
+      defaultMetrics: {
+        enabled: true,
+      },
     }),
 
     UserModule,
@@ -47,10 +45,10 @@ import { MetricsController } from './metric.controller';
     AuthModule,
     FileModule,
     GenreModule,
-    RatingModule
+    RatingModule,
   ],
 
-  controllers: [AppController, MetricsController],
-  providers: [AppService],
+  controllers: [MetricsController],
+  providers: [],
 })
 export class AppModule {}

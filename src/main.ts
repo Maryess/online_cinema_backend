@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
-import { PrometheusController } from '@willsoto/nestjs-prometheus';
 import { register } from 'prom-client';
 import { join } from 'path';
 import * as express from 'express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const PORT = 4200;
@@ -21,6 +21,17 @@ async function bootstrap() {
     methods: 'GET,POST,PUT,DELETE',
     credentials: true,
   });
+
+  const config = new DocumentBuilder()
+    .setTitle('Media API')
+    .setDescription('Документация REST API для медиа-приложения')
+    .setVersion('1.0')
+    .addTag('movie')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
+
   app.use('/metrics', async (req, res) => {
     res.set('Content-Type', register.contentType);
     res.end(await register.metrics());
