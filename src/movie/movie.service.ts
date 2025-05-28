@@ -7,7 +7,6 @@ import { Actor } from 'src/actor/entity/actor.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
 import { User } from 'src/user/entity/user.entity';
 import { Rating } from 'src/rating/entity/rating.entity';
-import { NotFoundException } from '@nestjs/common';
 
 export class MovieService {
   constructor(
@@ -20,148 +19,153 @@ export class MovieService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Rating)
-    private readonly ratingRepository: Repository<Rating>
+    private readonly ratingRepository: Repository<Rating>,
   ) {}
 
-  async createMovie(movie:CreateMovieDto) {
-    try{
+  async createMovie(movie: CreateMovieDto) {
+    try {
       const {
-        poster='',
-        bigPoster='',
-        name='',
-        slug='', 
-        deskription='',
-        year=0,
-        duration=0,
-        country ='',
-        videoUrl ='',
-        actors:actorIds,
-        genres:genreIds
-       } = movie;
-  
-      const actors = actorIds?   await this.actorsRepository.find({
-        where: actorIds.map((id) => ({ id })),
-      }) : [];
-  
-      const genres = genreIds? await this.genreRepository.find({
-        where: genreIds.map((id)=>({id}))
-      }):[];
-  
+        poster = '',
+        bigPoster = '',
+        name = '',
+        slug = '',
+        deskription = '',
+        year = 0,
+        duration = 0,
+        country = '',
+        videoUrl = '',
+        actors: actorIds,
+        genres: genreIds,
+      } = movie;
+
+      const actors = actorIds
+        ? await this.actorsRepository.find({
+            where: actorIds.map((id) => ({ id })),
+          })
+        : [];
+
+      const genres = genreIds
+        ? await this.genreRepository.find({
+            where: genreIds.map((id) => ({ id })),
+          })
+        : [];
+
       const createMovie = await this.movieRepository.create({
-        name:name,
-        slug:slug,
-        poster:poster,
-        bigPoster:bigPoster,
-        deskription:deskription,
-        year:year,
-        duration:duration,
-        country:country,
-        videoUrl:videoUrl,
+        name: name,
+        slug: slug,
+        poster: poster,
+        bigPoster: bigPoster,
+        deskription: deskription,
+        year: year,
+        duration: duration,
+        country: country,
+        videoUrl: videoUrl,
         actors,
-        genres
+        genres,
       });
-      
-      if(!createMovie){
-        return false
+
+      if (!createMovie) {
+        return false;
       }
       return await this.movieRepository.save(createMovie);
-    }catch{
+    } catch {
       return {
-        status:false
-      }
+        status: false,
+      };
     }
-     
   }
 
   async removeMovie(movieId: string) {
-
     try {
-      const movie = await this.movieRepository.findOne({ where: { id: movieId }, relations: ['genres', 'actors'] }); // relations: ['genres', 'actors']
+      const movie = await this.movieRepository.findOne({
+        where: { id: movieId },
+        relations: ['genres', 'actors'],
+      }); // relations: ['genres', 'actors']
       if (!movie) {
-        return false; 
+        return false;
       }
-      if(movie.actors.length && movie.genres.length === 0){
-        await this.movieRepository.remove(movie)
-        return true
-      }else{
+      if (movie.actors.length && movie.genres.length === 0) {
+        await this.movieRepository.remove(movie);
+        return true;
+      } else {
+        await this.movieRepository
+          .createQueryBuilder()
+          .relation(Movie, 'genres')
+          .of(movie)
+          .remove(movie.genres);
 
-      await this.movieRepository.createQueryBuilder()
-        .relation(Movie, 'genres')
-        .of(movie)
-        .remove(movie.genres);
+        await this.movieRepository
+          .createQueryBuilder()
+          .relation(Movie, 'actors')
+          .of(movie)
+          .remove(movie.actors);
 
-      await this.movieRepository.createQueryBuilder()
-        .relation(Movie, 'actors')
-        .of(movie)
-        .remove(movie.actors);
-
-      await this.movieRepository.remove(movie);
-      return true;}
+        await this.movieRepository.remove(movie);
+        return true;
+      }
     } catch (error) {
-      console.error("Ошибка при удалении фильма:", error);
+      console.error('Ошибка при удалении фильма:', error);
       return false;
     }
   }
 
-
-
-  async updateRating(movieId, ratingId){
-    const rating = await this.ratingRepository.findOneBy({id:ratingId})
-    if(!rating){
-      throw new Error ('Rating not found')
+  async updateRating(movieId, ratingId) {
+    const rating = await this.ratingRepository.findOneBy({ id: ratingId });
+    if (!rating) {
+      throw new Error('Rating not found');
     }
-    const movie = await this.movieRepository.findOneBy({id:movieId})
-    if(!movie){
-      throw new Error ('Movie not found')
+    const movie = await this.movieRepository.findOneBy({ id: movieId });
+    if (!movie) {
+      throw new Error('Movie not found');
     }
 
-    movie.rating = rating
+    movie.rating = rating;
   }
 
-  async getAllMovies(searchTerm?:string) {
-
-    const queryBuilder = this.movieRepository
-    .createQueryBuilder('movie')
-    .leftJoinAndSelect('movie.actors', 'actors')
-    .leftJoinAndSelect('movie.genres', 'genres')
-    .where('movie.deleted_at IS NULL')
-
-    if(searchTerm){
-      queryBuilder.andWhere(
-        "to_tsvector('english', movie.name || ' ' || movie.slug) @@ plainto_tsquery('english', :searchTerm)",
-        {searchTerm}
-      )
-    }
-
-    try{ 
-      const movies = queryBuilder.getMany();
-
-      const newMovies = (await movies).sort((a,b)=>a.name.localeCompare(b.name))
-
-      return newMovies
-    }catch(error){
-      return error
-    }
-   
-  }
-
-  async getPopularMovie(){
-
+  async getAllMovies(searchTerm?: string) {
     const queryBuilder = this.movieRepository
       .createQueryBuilder('movie')
       .leftJoinAndSelect('movie.actors', 'actors')
       .leftJoinAndSelect('movie.genres', 'genres')
-    .where('movie.deleted_at IS NULL')
+      .where('movie.deleted_at IS NULL');
 
-    try{
-  
-      const movies = queryBuilder.getMany()
-       
-      const popularMovies = (await movies).sort((a,b)=> b.countOpened - a.countOpened)
+    if (searchTerm) {
+      queryBuilder.andWhere(
+        "to_tsvector('english', movie.name || ' ' || movie.slug) @@ plainto_tsquery('english', :searchTerm)",
+        { searchTerm },
+      );
+    }
 
-      return popularMovies
-    }catch(error){
-      return error
+    try {
+      const movies = queryBuilder.getMany();
+
+      const newMovies = (await movies).sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
+
+      return newMovies;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getPopularMovie() {
+    const queryBuilder = this.movieRepository
+      .createQueryBuilder('movie')
+      .leftJoinAndSelect('movie.actors', 'actors')
+      .leftJoinAndSelect('movie.genres', 'genres')
+      .where('movie.deleted_at IS NULL');
+
+    try {
+      const movies = queryBuilder.getMany();
+
+      const popularMovies = (await movies).sort(
+        (a, b) => b.countOpened - a.countOpened,
+      );
+
+      return popularMovies;
+    } catch (error) {
+      return error;
     }
   }
 
@@ -177,17 +181,17 @@ export class MovieService {
         duration,
         country,
         videoUrl,
-        actors: actorIds, 
+        actors: actorIds,
         genres: genreIds,
       } = dto;
 
       const movie = await this.movieRepository.findOne({
         where: { id },
-        relations: ['actors', 'genres'], 
+        relations: ['actors', 'genres'],
       });
 
       if (!movie) {
-        return null; 
+        return null;
       }
 
       const updateData: Partial<Movie> = {
@@ -204,29 +208,29 @@ export class MovieService {
 
       await this.movieRepository.update(id, updateData);
 
-      if (actorIds !== undefined) { 
+      if (actorIds !== undefined) {
         await this.movieRepository
           .createQueryBuilder()
           .relation(Movie, 'actors')
           .of(id)
-          .remove(movie.actors?.map((actor) => actor.id) || []); 
+          .remove(movie.actors?.map((actor) => actor.id) || []);
       }
 
       if (actorIds && actorIds.length > 0) {
-        const actors = await this.actorsRepository.findByIds(actorIds); 
+        const actors = await this.actorsRepository.findByIds(actorIds);
         await this.movieRepository
           .createQueryBuilder()
           .relation(Movie, 'actors')
           .of(id)
-          .add(actors); 
+          .add(actors);
       }
 
-      if (genreIds !== undefined) { 
+      if (genreIds !== undefined) {
         await this.movieRepository
           .createQueryBuilder()
           .relation(Movie, 'genres')
           .of(id)
-          .remove(movie.genres?.map((genre) => genre.id) || []);  
+          .remove(movie.genres?.map((genre) => genre.id) || []);
       }
 
       if (genreIds && genreIds.length > 0) {
@@ -241,29 +245,30 @@ export class MovieService {
       const updatedMovie = await this.movieRepository.findOne({
         where: { id },
         relations: ['actors', 'genres'],
-      }); 
+      });
       return updatedMovie;
     } catch (error) {
-      console.error("Error updating movie:", error); 
-      throw error; 
+      console.error('Error updating movie:', error);
+      throw error;
     }
   }
 
-  async getMovieBySlug(slug:string){
+  async getMovieBySlug(slug: string) {
     try {
-      const movie = await this.movieRepository.findOne({where:{slug: slug},
-      relations:['actors', 'genres']
+      const movie = await this.movieRepository.findOne({
+        where: { slug: slug },
+        relations: ['actors', 'genres'],
       });
 
       const updateData = {
-        countOpened: movie.countOpened + 1
-      }
+        countOpened: movie.countOpened + 1,
+      };
 
-      await this.movieRepository.update(movie.id, updateData)
+      await this.movieRepository.update(movie.id, updateData);
 
-      return movie
+      return movie;
     } catch (error) {
-      console.error("Error fetching movie:", error); 
+      console.error('Error fetching movie:', error);
       return {
         status: false,
       };
